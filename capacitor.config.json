@@ -1,6 +1,5 @@
 {
   "appId": "com.rosapanel.app",
   "appName": "Rosa panel",
-  "webDir": ".",
-  "bundledWebRuntime": false
+  "webDir": "www"
 }
