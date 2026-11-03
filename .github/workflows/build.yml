@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 18
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -22,23 +22,27 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Prepare Web Directory
+        run: |
+          mkdir -p www
+          cp index.html www/
+
       - name: Install Dependencies
         run: |
           npm install
-          npm install -g @capacitor/cli
 
-      - name: Build Web Assets & Initialize Android
+      - name: Add and Sync Android Platform
         run: |
-          npx cap add android || true
+          npx cap add android
           npx cap sync android
 
       - name: Build Debug APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: RosaPanel-APK
