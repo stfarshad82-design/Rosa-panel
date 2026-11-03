@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>آسان استارز | خرید خدمات مجازی</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Vazirmatn', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen pb-24 transition-colors duration-300">
+
+    <!-- کانتینر اصلی اپلیکیشن مشتری -->
+    <div id="app-container" class="max-w-md mx-auto min-h-screen relative shadow-2xl bg-white dark:bg-slate-900 flex flex-col">
+
+        <!-- ========================================== -->
+        <!-- 1. صفحه خانه (HOME PAGE)                   -->
+        <!-- ========================================== -->
+        <div id="page-home" class="page-view p-4 space-y-5">
+            <div class="flex items-center justify-between pt-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-500 to-sky-300 flex items-center justify-center text-white text-xl font-bold shadow-md shadow-brand-500/20">
+                        <span id="user-avatar-char">ک</span>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400">خوش آمدید 👋</div>
+                        <div class="font-bold text-slate-800 dark:text-white" id="user-display-name">کاربر آسان استارز</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="ThemeManager.toggle()" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center">
+                        <i id="theme-icon" class="fa-solid fa-moon"></i>
+                    </button>
+                    <div onclick="Navigation.goTo('wallet')" class="bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-xl flex items-center gap-2 text-xs font-bold text-brand-600 dark:text-brand-400 cursor-pointer">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span id="home-wallet-balance">۰ تومان</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- اسلایدر بنر -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-500 to-blue-600 text-white p-5 shadow-lg shadow-brand-500/20">
+                <div class="relative z-10 space-y-2">
+                    <span class="bg-white/20 px-2.5 py-1 rounded-full text-[10px] font-bold">پرداخت مایکت</span>
+                    <h3 class="text-lg font-extrabold">آسان استارز</h3>
+                    <p class="text-xs text-sky-100">سفارش آنی استارز تلگرام و خدمات شبکه‌های مجازی</p>
+                    <button onclick="Navigation.goTo('services')" class="mt-3 bg-white text-brand-600 px-4 py-2 rounded-xl text-xs font-bold shadow">مشاهده محصولات</button>
+                </div>
+                <i class="fa-solid fa-bolt absolute -left-4 -bottom-4 text-8xl text-white/10 rotate-12"></i>
+            </div>
+
+            <!-- دکمه تیکت و پشتیبانی -->
+            <div onclick="Navigation.goTo('support')" class="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl flex items-center justify-between cursor-pointer hover:border-brand-300 transition">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-900/40 text-brand-500 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold">پشتیبانی و تیکت‌ها</div>
+                        <div class="text-xs text-slate-400">ارسال سوال، گزارش مشکل و پیگیری خرید</div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-left text-slate-300 text-xs"></i>
+            </div>
+
+            <!-- بسته‌های منتخب -->
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-bold text-sm">محصولات پرطرفدار</h4>
+                    <button onclick="Navigation.goTo('services')" class="text-xs text-brand-500 font-medium">مشاهده همه <i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                </div>
+                <div class="space-y-3" id="featured-products-list"></div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 2. صفحه خدمات و سفارش (SERVICES)           -->
+        <!-- ========================================== -->
+        <div id="page-services" class="page-view p-4 space-y-4 hidden">
+            <div class="flex items-center justify-between pt-2">
+                <h2 class="font-bold text-lg">لیست خدمات و سرویس‌ها</h2>
+            </div>
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute right-3 top-3.5 text-slate-400 text-sm"></i>
+                <input type="text" id="service-search-input" onkeyup="ServiceManager.filter()" placeholder="جستجوی سرویس..." class="w-full bg-slate-100 dark:bg-slate-800/80 pr-10 pl-4 py-3 rounded-2xl text-xs outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar py-1" id="category-filter-bar"></div>
+            <div class="space-y-3 pt-2" id="services-list-container"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 3. صفحه سفارشات من (ORDERS)               -->
+        <!-- ========================================== -->
+        <div id="page-orders" class="page-view p-4 space-y-4 hidden">
+            <div class="pt-2">
+                <h2 class="font-bold text-lg">سفارشات من</h2>
+            </div>
+            <div class="space-y-3 pt-2" id="user-orders-list"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 4. صفحه کیف پول (شارژ با مایکت)             -->
+        <!-- ========================================== -->
+        <div id="page-wallet" class="page-view p-4 space-y-5 hidden">
+            <div class="pt-2">
+                <h2 class="font-bold text-lg">کیف پول من</h2>
+            </div>
+
+            <!-- کارت موجودی -->
+            <div class="bg-gradient-to-r from-brand-600 to-sky-500 rounded-3xl p-6 text-white shadow-xl shadow-brand-500/20 space-y-2">
+                <div class="text-xs text-sky-100 flex items-center justify-between">
+                    <span>موجودی قابل استفاده</span>
+                    <i class="fa-solid fa-wallet text-xl"></i>
+                </div>
+                <div class="text-3xl font-extrabold flex items-center gap-2">
+                    <span id="wallet-card-balance">۰</span>
+                    <span class="text-sm font-normal">تومان</span>
+                </div>
+            </div>
+
+            <!-- بسته‌های شارژ مستقیم از مایکت -->
+            <div class="space-y-3">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-bag-shopping text-brand-500"></i>
+                    انتخاب بسته شارژ کیف پول (پرداخت با مایکت)
+                </h3>
+                <div class="grid grid-cols-1 gap-2.5" id="myket-packages-container">
+                    <!-- به صورت خودکار با بسته‌های مایکت پر می‌شود -->
+                </div>
+            </div>
+
+            <!-- تاریخچه تراکنش‌ها -->
+            <div class="space-y-3 pt-2">
+                <h4 class="font-bold text-sm">تاریخچه تراکنش‌ها</h4>
+                <div id="transactions-history-list" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 5. صفحه تیکت و پشتیبانی (SUPPORT)          -->
+        <!-- ========================================== -->
+        <div id="page-support" class="page-view p-4 space-y-4 hidden">
+            <div class="pt-2 flex items-center justify-between">
+                <h2 class="font-bold text-lg">پشتیبانی و تیکت‌ها</h2>
+                <button onclick="SupportManager.openNewTicketModal()" class="bg-brand-500 hover:bg-brand-600 text-white text-xs px-3 py-2 rounded-xl font-bold flex items-center gap-1.5 shadow">
+                    <i class="fa-solid fa-plus"></i> ثبت تیکت جدید
+                </button>
+            </div>
+
+            <div class="space-y-3" id="tickets-list-container">
+                <!-- لیست تیکت‌ها اینجا نشان داده می‌شود -->
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- BOTTOM NAVIGATION BAR                      -->
+        <!-- ========================================== -->
+        <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 px-4 py-2 flex items-center justify-between z-40">
+            <button onclick="Navigation.goTo('home')" id="nav-home" class="flex flex-col items-center gap-1 text-brand-500 font-bold transition">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px]">خانه</span>
+            </button>
+            <button onclick="Navigation.goTo('orders')" id="nav-orders" class="flex flex-col items-center gap-1 text-slate-400 transition">
+                <i class="fa-solid fa-receipt text-lg"></i>
+                <span class="text-[10px]">سفارشات</span>
+            </button>
+            <button onclick="Navigation.goTo('services')" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-500 to-sky-400 text-white flex items-center justify-center text-xl shadow-lg shadow-brand-500/40 -mt-5 hover:scale-105 transition">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+            <button onclick="Navigation.goTo('wallet')" id="nav-wallet" class="flex flex-col items-center gap-1 text-slate-400 transition">
+                <i class="fa-solid fa-wallet text-lg"></i>
+                <span class="text-[10px]">کیف پول</span>
+            </button>
+            <button onclick="Navigation.goTo('support')" id="nav-support" class="flex flex-col items-center gap-1 text-slate-400 transition">
+                <i class="fa-solid fa-headset text-lg"></i>
+                <span class="text-[10px]">پشتیبانی</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- مودال سفارش -->
+    <div id="modal-order-calculator" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end justify-center hidden">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-base" id="calc-service-title">ثبت سفارش</h3>
+                <button onclick="OrderCalculator.close()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="calc-service-desc-box" class="text-xs text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl"></div>
+            <div>
+                <label class="block text-xs font-bold mb-1.5" id="calc-link-label">لینک مقصد یا آیدی تلگرام</label>
+                <input type="text" id="calc-link-input" placeholder="مثلا: @username یا https://t.me/..." class="w-full bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl text-xs outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div id="calc-quantity-container" class="space-y-3">
+                <div class="flex items-center justify-between text-xs font-bold">
+                    <span>تعداد: <span id="calc-range-hint" class="text-[10px] font-normal text-slate-400"></span></span>
+                    <input type="number" id="calc-qty-input" oninput="OrderCalculator.fromInput()" class="w-28 bg-slate-100 dark:bg-slate-800 text-center text-brand-500 font-extrabold text-sm p-2 rounded-xl outline-none">
+                </div>
+            </div>
+            <div class="bg-brand-50 dark:bg-brand-950/40 p-4 rounded-2xl flex items-center justify-between">
+                <span class="text-xs font-bold">مبلغ قابل پرداخت:</span>
+                <div class="text-lg font-black text-brand-600 dark:text-brand-400">
+                    <span id="calc-total-price">۰</span> <span class="text-xs font-normal">تومان</span>
+                </div>
+            </div>
+            <button onclick="OrderCalculator.submit()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3.5 rounded-2xl text-xs shadow-lg shadow-brand-500/30 transition">
+                پرداخت از موجودی کیف پول
+            </button>
+        </div>
+    </div>
+
+    <!-- مودال ارسال تیکت جدید -->
+    <div id="modal-new-ticket" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end justify-center hidden">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-3xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-base">ارسال تیکت جدید</h3>
+                <button onclick="SupportManager.closeNewTicketModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1.5">موضوع تیکت</label>
+                <input type="text" id="ticket-subject" placeholder="مثلاً: مشکل در انجام سفارش استارز" class="w-full bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl text-xs outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1.5">پیام شما</label>
+                <textarea id="ticket-message" rows="4" placeholder="توضیحات کامل سفارش یا سوال خود را بنویسید..." class="w-full bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl text-xs outline-none"></textarea>
+            </div>
+            <button onclick="SupportManager.submitTicket()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-2xl text-xs shadow-lg shadow-brand-500/30 transition">
+                ارسال پیام به پشتیبانی
+            </button>
+        </div>
+    </div>
+
+    <!-- توست نوتیفیکیشن -->
+    <div id="toast-container" class="fixed top-5 left-0 right-0 max-w-md mx-auto px-4 z-50 pointer-events-none space-y-2"></div>
+
+    <script>
+        const $ = id => document.getElementById(id);
+
+        // تعریف بسته‌های ثابت شارژ مایکت (SKU ها در پنل مایکت تعریف می‌شوند)
+        const MYKET_PACKAGES = [
+            { id: 'charge_20k', amount: 20000, title: 'شارژ ۲۰,۰۰۰ تومانی', badge: '' },
+            { id: 'charge_50k', amount: 50000, title: 'شارژ ۵۰,۰۰۰ تومانی', badge: 'پرفروش' },
+            { id: 'charge_100k', amount: 100000, title: 'شارژ ۱۰۰,۰۰۰ تومانی', badge: 'ویژه' },
+            { id: 'charge_200k', amount: 200000, title: 'شارژ ۲۰۰,۰۰۰ تومانی', badge: 'تخفیف‌دار' }
+        ];
+
+        const AppState = {
+            data: {
+                user: { name: "کاربر آسان استارز", walletBalance: 0 },
+                categories: [
+                    { id: 'all', title: 'همه' },
+                    { id: 'telegram', title: 'تلگرام', icon: 'fa-paper-plane' },
+                    { id: 'instagram', title: 'اینستاگرام', icon: 'fa-camera' }
+                ],
+                products: [
+                    { id: 1, category: 'telegram', title: 'استارز تلگرام', price: 550, type: 'service', desc: 'شارژ مستقیم و سریع استارز تلگرام', min: 50, max: 10000 },
+                    { id: 2, category: 'telegram', title: 'پرمیوم تلگرام ۳ ماهه', price: 4100000, type: 'file', desc: 'فعال‌سازی بدون نیاز به پسورد', min: 1, max: 1 },
+                    { id: 3, category: 'instagram', title: 'فالوور ایرانی اینستاگرام', price: 2100, type: 'service', desc: 'کیفیت بالا با کمترین ریزش', min: 100, max: 50000 }
+                ],
+                orders: [],
+                transactions: [],
+                tickets: []
+            },
+            init() {
+                try {
+                    const local = JSON.parse(localStorage.getItem('asan_stars_client_db'));
+                    if (local) this.data = { ...this.data, ...local };
+                } catch(e) {}
+                this.save();
+            },
+            save() {
+                localStorage.setItem('asan_stars_client_db', JSON.stringify(this.data));
+            }
+        };
+
+        const ThemeManager = {
+            init() {
+                const isDark = localStorage.getItem('theme') === 'dark';
+                this.set(isDark);
+            },
+            toggle() {
+                const isDark = document.documentElement.classList.contains('dark');
+                this.set(!isDark);
+            },
+            set(isDark) {
+                const icon = $('theme-icon');
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    if (icon) icon.className = "fa-solid fa-sun";
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    if (icon) icon.className = "fa-solid fa-moon";
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+        };
+
+        const Navigation = {
+            goTo(pageId) {
+                document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('[id^="nav-"]').forEach(btn => {
+                    btn.classList.remove('text-brand-500');
+                    btn.classList.add('text-slate-400');
+                });
+                const target = $('page-' + pageId);
+                if (target) target.classList.remove('hidden');
+
+                const navBtn = $('nav-' + pageId);
+                if (navBtn) {
+                    navBtn.classList.remove('text-slate-400');
+                    navBtn.classList.add('text-brand-500');
+                }
+                window.scrollTo(0,0);
+
+                if (pageId === 'home') RenderEngine.renderHome();
+                if (pageId === 'services') ServiceManager.render();
+                if (pageId === 'orders') OrderManager.render();
+                if (pageId === 'wallet') WalletManager.render();
+                if (pageId === 'support') SupportManager.render();
+            }
+        };
+
+        const RenderEngine = {
+            renderHome() {
+                $('home-wallet-balance').innerText = AppState.data.user.walletBalance.toLocaleString() + ' تومان';
+                const featured = AppState.data.products.slice(0, 3);
+                $('featured-products-list').innerHTML = featured.map(p => `
+                    <div onclick="OrderCalculator.open(${p.id})" class="bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl flex items-center justify-between cursor-pointer">
+                        <div>
+                            <div class="font-bold text-xs">${p.title}</div>
+                            <div class="text-[11px] text-slate-400 mt-0.5">${p.desc}</div>
+                        </div>
+                        <div class="text-xs font-extrabold text-brand-600 dark:text-brand-400">${p.price.toLocaleString()} ت</div>
+                    </div>
+                `).join('');
+            }
+        };
+
+        const ServiceManager = {
+            currentCat: 'all',
+            render() {
+                $('category-filter-bar').innerHTML = AppState.data.categories.map(c => `
+                    <button onclick="ServiceManager.setCat('${c.id}')" class="px-4 py-2 rounded-xl text-xs font-bold ${this.currentCat === c.id ? 'bg-brand-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}">
+                        ${c.title}
+                    </button>
+                `).join('');
+                this.filter();
+            },
+            setCat(id) { this.currentCat = id; this.render(); },
+            filter() {
+                const q = $('service-search-input').value.toLowerCase();
+                const list = AppState.data.products.filter(p => 
+                    (this.currentCat === 'all' || p.category === this.currentCat) &&
+                    (p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q))
+                );
+                $('services-list-container').innerHTML = list.map(p => `
+                    <div onclick="OrderCalculator.open(${p.id})" class="bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl flex items-center justify-between cursor-pointer">
+                        <div>
+                            <div class="font-bold text-xs">${p.title}</div>
+                            <div class="text-[11px] text-slate-400">${p.desc}</div>
+                        </div>
+                        <span class="text-xs font-bold text-brand-600 dark:text-brand-400">${p.price.toLocaleString()} تومان</span>
+                    </div>
+                `).join('');
+            }
+        };
+
+        const OrderCalculator = {
+            selected: null,
+            open(id) {
+                this.selected = AppState.data.products.find(p => p.id === id);
+                if (!this.selected) return;
+                $('calc-service-title').innerText = this.selected.title;
+                $('calc-service-desc-box').innerText = this.selected.desc;
+                $('calc-quantity-container').classList.toggle('hidden', this.selected.type === 'file');
+                $('calc-qty-input').value = this.selected.min;
+                this.fromInput();
+                $('modal-order-calculator').classList.remove('hidden');
+            },
+            close() { $('modal-order-calculator').classList.add('hidden'); },
+            fromInput() {
+                const qty = parseInt($('calc-qty-input').value) || this.selected.min;
+                const total = this.selected.type === 'file' ? this.selected.price : qty * this.selected.price;
+                $('calc-total-price').innerText = total.toLocaleString();
+            },
+            submit() {
+                const link = $('calc-link-input').value.trim();
+                if (!link) return Toast.show('لطفاً آدرس یا مشخصات مقصد را بنویسید.', 'error');
+                const qty = this.selected.type === 'file' ? 1 : (parseInt($('calc-qty-input').value) || this.selected.min);
+                const total = this.selected.type === 'file' ? this.selected.price : qty * this.selected.price;
+
+                if (AppState.data.user.walletBalance < total) {
+                    Toast.show('موجودی ناکافی است. ابتدا کیف پول را شارژ کنید.', 'error');
+                    this.close();
+                    Navigation.goTo('wallet');
+                    return;
+                }
+
+                AppState.data.user.walletBalance -= total;
+                AppState.data.orders.unshift({
+                    id: Date.now(),
+                    productTitle: this.selected.title,
+                    link: link,
+                    totalPrice: total,
+                    status: 'در حال پردازش',
+                    date: new Date().toLocaleDateString('fa-IR')
+                });
+                AppState.data.transactions.unshift({
+                    id: Date.now(),
+                    title: `خرید ${this.selected.title}`,
+                    amount: total,
+                    type: 'minus',
+                    date: new Date().toLocaleDateString('fa-IR')
+                });
+                AppState.save();
+                this.close();
+                Toast.show('سفارش شما با موفقیت ثبت شد.', 'success');
+                Navigation.goTo('orders');
+            }
+        };
+
+        const WalletManager = {
+            render() {
+                $('wallet-card-balance').innerText = AppState.data.user.walletBalance.toLocaleString();
+                
+                // لیست بسته‌های مایکت
+                $('myket-packages-container').innerHTML = MYKET_PACKAGES.map(pkg => `
+                    <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-xs">${pkg.title}</div>
+                            <div class="text-[10px] text-slate-400">شناسه: ${pkg.id}</div>
+                        </div>
+                        <button onclick="WalletManager.buyMyketPackage('${pkg.id}', ${pkg.amount})" class="bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-cart-shopping"></i> خرید ${pkg.amount.toLocaleString()} ت
+                        </button>
+                    </div>
+                `).join('');
+
+                // تراکنش‌ها
+                $('transactions-history-list').innerHTML = AppState.data.transactions.length ? AppState.data.transactions.map(t => `
+                    <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl flex items-center justify-between text-xs">
+                        <div>
+                            <div class="font-bold">${t.title}</div>
+                            <div class="text-[10px] text-slate-400">${t.date}</div>
+                        </div>
+                        <span class="font-bold ${t.type === 'plus' ? 'text-emerald-500' : 'text-rose-500'}">
+                            ${t.type === 'plus' ? '+' : '-'}${t.amount.toLocaleString()} ت
+                        </span>
+                    </div>
+                `).join('') : '<div class="text-xs text-slate-400 text-center py-4">تراکنشی یافت نشد.</div>';
+            },
+
+            buyMyketPackage(sku, amount) {
+                // اگر در محیط برنامه اندروید باشیم، کدهای نیتیو مایکت فراخوانی می‌شود
+                if (window.Android && window.Android.startPayment) {
+                    window.Android.startPayment(sku);
+                } else {
+                    // شبیه‌ساز پرداخت آزمایشی (برای تست درون مرورگر)
+                    const ok = confirm(`آیا مایل به خرید بسته "${sku}" به مبلغ ${amount.toLocaleString()} تومان با پرداخت مایکت هستید؟`);
+                    if (ok) {
+                        this.onPaymentSuccess(amount, "MYKET_TEST_REF");
+                    }
+                }
+            },
+
+            // این تابع بعد از پرداخت موفق در مایکت اجرا می‌شود
+            onPaymentSuccess(amount, ref) {
+                AppState.data.user.walletBalance += amount;
+                AppState.data.transactions.unshift({
+                    id: Date.now(),
+                    title: 'شارژ با پرداخت مایکت',
+                    amount: amount,
+                    type: 'plus',
+                    date: new Date().toLocaleDateString('fa-IR')
+                });
+                AppState.save();
+                Toast.show('کیف پول شما با موفقیت شارژ شد.', 'success');
+                this.render();
+            }
+        };
+
+        const OrderManager = {
+            render() {
+                const list = AppState.data.orders;
+                $('user-orders-list').innerHTML = list.length ? list.map(o => `
+                    <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl space-y-2">
+                        <div class="flex items-center justify-between text-xs font-bold">
+                            <span>${o.productTitle}</span>
+                            <span class="bg-brand-50 text-brand-600 px-2 py-0.5 rounded-full text-[10px]">${o.status}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-400 font-mono">${o.link}</div>
+                        <div class="flex justify-between items-center text-xs border-t border-slate-100 dark:border-slate-700/50 pt-2">
+                            <span class="text-slate-400 text-[10px]">${o.date}</span>
+                            <span class="font-bold text-brand-500">${o.totalPrice.toLocaleString()} تومان</span>
+                        </div>
+                    </div>
+                `).join('') : '<div class="text-center py-10 text-xs text-slate-400">هنوز سفارشی ثبت نشده است.</div>';
+            }
+        };
+
+        const SupportManager = {
+            render() {
+                const list = AppState.data.tickets;
+                $('tickets-list-container').innerHTML = list.length ? list.map(t => `
+                    <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl space-y-2">
+                        <div class="flex items-center justify-between text-xs font-bold">
+                            <span>${t.subject}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full ${t.reply ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}">
+                                ${t.reply ? 'پاسخ داده شده' : 'در انتظار پاسخ'}
+                            </span>
+                        </div>
+                        <div class="text-xs text-slate-500 bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl">${t.message}</div>
+                        ${t.reply ? `
+                            <div class="text-xs text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/40 p-2.5 rounded-xl border-r-2 border-brand-500">
+                                <b>پاسخ پشتیبانی:</b> ${t.reply}
+                            </div>
+                        ` : ''}
+                        <div class="text-[10px] text-slate-400 text-left">${t.date}</div>
+                    </div>
+                `).join('') : '<div class="text-center py-10 text-xs text-slate-400">هیچ تیکتی وجود ندارد. برای ارتباط دکمه بالا را بزنید.</div>';
+            },
+            openNewTicketModal() { $('modal-new-ticket').classList.remove('hidden'); },
+            closeNewTicketModal() { $('modal-new-ticket').classList.add('hidden'); },
+            submitTicket() {
+                const sub = $('ticket-subject').value.trim();
+                const msg = $('ticket-message').value.trim();
+                if (!sub || !msg) return Toast.show('لطفاً عنوان و متن پیام را کامل بنویسید.', 'error');
+
+                AppState.data.tickets.unshift({
+                    id: Date.now(),
+                    subject: sub,
+                    message: msg,
+                    reply: null,
+                    date: new Date().toLocaleDateString('fa-IR')
+                });
+                AppState.save();
+                $('ticket-subject').value = '';
+                $('ticket-message').value = '';
+                this.closeNewTicketModal();
+                Toast.show('تیکت شما با موفقیت ارسال شد.', 'success');
+                this.render();
+            }
+        };
+
+        const Toast = {
+            show(msg, type = 'info') {
+                const container = $('toast-container');
+                const t = document.createElement('div');
+                t.className = `${type === 'error' ? 'bg-rose-500' : 'bg-slate-800'} text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl flex items-center justify-between`;
+                t.innerHTML = `<span>${msg}</span><i class="fa-solid fa-xmark mr-2 cursor-pointer" onclick="this.parentElement.remove()"></i>`;
+                container.appendChild(t);
+                setTimeout(() => t.remove(), 3500);
+            }
+        };
+
+        window.onload = function() {
+            AppState.init();
+            ThemeManager.init();
+            Navigation.goTo('home');
+        };
+    </script>
+</body>
+</html>
