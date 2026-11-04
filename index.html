@@ -386,6 +386,19 @@
       color: var(--primary);
       margin-bottom: 12px;
     }
+    .qty-input {
+      width: 62%;
+      text-align: center;
+      font: inherit;
+      color: var(--primary);
+      background: var(--bg-card-soft);
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      padding: 8px 6px;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    .qty-input:focus { border-color: var(--primary); }
     .range-slider {
       width: 100%;
       height: 8px;
@@ -805,7 +818,11 @@
       <div class="form-group">
         <label class="form-label">تعداد مورد نظر</label>
         <div class="quantity-box">
-          <div class="qty-display"><span id="qtyVal">۵۰</span> عدد</div>
+          <div class="qty-display">
+            <input type="number" inputmode="numeric" id="qtyInput" class="qty-input" value="50" oninput="onQtyType()" onblur="onQtyBlur()">
+            <span style="font-size:16px">عدد</span>
+          </div>
+          <div id="qtyRangeNote" style="text-align:center;font-size:12px;color:var(--text-muted);margin-bottom:6px"></div>
           <input type="range" class="range-slider" id="qtySlider" min="20" max="10000" step="10" value="50" oninput="onSliderChange(this.value)">
           <div class="quick-qty-grid">
             <div class="q-btn" onclick="setQuickQty(50)">۵۰</div>
@@ -1073,8 +1090,10 @@
     const slider = document.getElementById('qtySlider');
     slider.min = selectedService.min_order;
     slider.max = selectedService.max_order;
+    slider.step = (selectedService.max_order - selectedService.min_order) > 1000 ? 10 : 1;
     slider.value = selectedService.min_order;
     onSliderChange(selectedService.min_order);
+    document.getElementById('qtyRangeNote').innerText = `حداقل ${Number(selectedService.min_order).toLocaleString()} • حداکثر ${Number(selectedService.max_order).toLocaleString()}`;
 
     document.getElementById('targetLinkInput').value = '';
     document.getElementById('purchaseView').classList.add('open');
@@ -1084,12 +1103,32 @@
     document.getElementById('purchaseView').classList.remove('open');
   }
 
-  function onSliderChange(val) {
-    document.getElementById('qtyVal').innerText = Number(val).toLocaleString();
+  function updateTotal(val) {
     if (selectedService) {
-      const total = Number(selectedService.price_per_unit) * Number(val);
+      const total = Math.ceil(Number(selectedService.price_per_unit) * Number(val || 0));
       document.getElementById('totalOrderPrice').innerText = total.toLocaleString();
     }
+  }
+  function onSliderChange(val) {
+    document.getElementById('qtyInput').value = val;
+    updateTotal(val);
+  }
+  // تایپ دستی تعداد: هنگام تایپ محدود نمی‌شود، فقط جمع کل زنده به‌روز می‌شود
+  function onQtyType() {
+    const v = parseInt(document.getElementById('qtyInput').value) || 0;
+    updateTotal(v);
+    if (selectedService && v >= selectedService.min_order && v <= selectedService.max_order) {
+      document.getElementById('qtySlider').value = v;
+    }
+  }
+  // با خروج از کادر، عدد داخل بازه مجاز قرار می‌گیرد
+  function onQtyBlur() {
+    if (!selectedService) return;
+    let v = parseInt(document.getElementById('qtyInput').value) || selectedService.min_order;
+    v = Math.max(selectedService.min_order, Math.min(v, selectedService.max_order));
+    document.getElementById('qtyInput').value = v;
+    document.getElementById('qtySlider').value = v;
+    updateTotal(v);
   }
 
   function setQuickQty(qty) {
@@ -1112,10 +1151,14 @@
   async function submitFinalOrder() {
     if (!selectedService) return;
     const link = document.getElementById('targetLinkInput').value.trim();
-    const qty = parseInt(document.getElementById('qtySlider').value);
+    const qty = parseInt(document.getElementById('qtyInput').value) || 0;
 
     if (!link) {
       showModal('خطا', 'لطفاً لینک یا آیدی مقصد را وارد نمایید.', 'error');
+      return;
+    }
+    if (qty < selectedService.min_order || qty > selectedService.max_order) {
+      showModal('تعداد نامعتبر', `تعداد باید بین ${Number(selectedService.min_order).toLocaleString()} تا ${Number(selectedService.max_order).toLocaleString()} باشد.`, 'error');
       return;
     }
 
