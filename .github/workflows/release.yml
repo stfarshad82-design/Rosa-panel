@@ -1,0 +1,80 @@
+name: Rosa Release (signed)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: بررسی وجود کلید امضا (Secrets)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          for v in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!v}" ]; then echo "::error::Secret $v تنظیم نشده است"; exit 1; fi
+          done
+
+      - name: آماده‌سازی پروژه اندروید
+        run: |
+          source app-version.env
+          mkdir -p www
+          sed "s/const CURRENT_APP_VERSION = [0-9]*;/const CURRENT_APP_VERSION = $VERSION_CODE;/" index.html > www/index.html
+          npm install
+          npx cap add android
+          if [ ! -f assets/icon.png ]; then
+            echo "::error::فایل assets/icon.png در ریپو پیدا نشد (باید داخل پوشه assets باشد)"
+            exit 1
+          fi
+          npm install --no-save @capacitor/assets
+          npx capacitor-assets generate --android --iconBackgroundColor '#0000ff' --iconBackgroundColorDark '#0000ff'
+          echo "ICON OK:"; ls android/app/src/main/res | grep mipmap
+          sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/; s/versionName \".*\"/versionName \"$VERSION_NAME\"/" android/app/build.gradle
+          npx cap sync android
+
+      - name: ساخت APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: امضا با کلید اختصاصی
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          source app-version.env
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/rosa.keystore"
+          mkdir -p output
+          UNSIGNED=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          "$BT/zipalign" -p 4 "$UNSIGNED" "$RUNNER_TEMP/aligned.apk"
+          "$BT/apksigner" sign --ks "$RUNNER_TEMP/rosa.keystore" --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass env:KEYSTORE_PASSWORD --key-pass env:KEY_PASSWORD \
+            --out "output/RosaPanel-v$VERSION_NAME.apk" "$RUNNER_TEMP/aligned.apk"
+          "$BT/apksigner" verify --print-certs "output/RosaPanel-v$VERSION_NAME.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RosaPanel-APK
+          path: output/*.apk
