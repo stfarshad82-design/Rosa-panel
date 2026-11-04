@@ -679,7 +679,7 @@
     <div class="form-group">
       <div class="note-box">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 18px; margin-top: 2px;"></i>
-        <div>برای پرداخت موفق، حتماً فیلترشکن (VPN) خود را هنگام رفتن به درگاه بانکی خاموش کنید.</div>
+        <div>شارژ کیف پول فعلاً از طریق درخواست به پشتیبانی انجام می‌شود؛ پس از تایید، موجودی شما افزایش می‌یابد.</div>
       </div>
     </div>
 
@@ -703,7 +703,7 @@
 
     <button class="submit-order-btn" style="width: 100%; justify-content: center; margin-top: 15px;" onclick="requestBankGateway()">
       <i class="fa-solid fa-lock"></i>
-      <span>پرداخت آنلاین</span>
+      <span>ارسال درخواست شارژ</span>
     </button>
   </section>
 
@@ -737,6 +737,16 @@
     </button>
 
     <div style="margin-top: 35px;">
+      <div class="wide-feature-card" onclick="openOrders()">
+        <div class="w-right"><div class="w-icon" style="background:#0ea5e9"><i class="fa-solid fa-list-check"></i></div>
+        <div><div class="w-title">سفارش‌های من</div><div class="w-sub">پیگیری وضعیت سفارش‌ها</div></div></div>
+        <i class="fa-solid fa-chevron-left text-muted"></i>
+      </div>
+      <div class="wide-feature-card" onclick="openTickets()">
+        <div class="w-right"><div class="w-icon" style="background:#8b5cf6"><i class="fa-solid fa-headset"></i></div>
+        <div><div class="w-title">پشتیبانی</div><div class="w-sub">ارسال تیکت و مشاهده پاسخ</div></div></div>
+        <i class="fa-solid fa-chevron-left text-muted"></i>
+      </div>
       <div class="wide-feature-card" onclick="checkForAppUpdate(true)">
         <div class="w-right">
           <div class="w-icon" style="background: #64748b;"><i class="fa-solid fa-rotate"></i></div>
@@ -849,6 +859,31 @@
     </div>
   </nav>
 
+  <!-- ورود / ثبت‌نام -->
+  <div class="purchase-view open" id="authView" style="z-index:150">
+    <div class="view-header"><div style="width:40px"></div><div class="view-title">ورود به رزا پنل</div><div style="width:40px"></div></div>
+    <div class="view-content">
+      <div id="regBox" style="display:none">
+        <div class="form-group"><label class="form-label">نام</label><div class="input-with-action"><input id="authName" placeholder="نام شما"></div></div>
+        <div class="form-group"><label class="form-label">ایمیل (جیمیل)</label><div class="input-with-action"><input id="authEmail" type="email" dir="ltr" placeholder="example@gmail.com"></div></div>
+      </div>
+      <div class="form-group"><label class="form-label">نام کاربری یا ایمیل</label><div class="input-with-action"><input id="authUser" dir="ltr" autocapitalize="none" placeholder="username"></div></div>
+      <div class="form-group"><label class="form-label">رمز عبور</label><div class="input-with-action"><input id="authPass" type="password" dir="ltr" placeholder="حداقل ۶ کاراکتر"></div></div>
+      <button class="submit-order-btn" id="loginBtn" style="width:100%;justify-content:center" onclick="doAuth(false)"><span>ورود</span></button>
+      <button class="submit-order-btn" id="regBtn" style="width:100%;justify-content:center;display:none" onclick="doAuth(true)"><span>ثبت‌نام</span></button>
+      <div id="authSwitch" style="text-align:center;margin-top:16px;font-size:13px">حساب ندارید؟ <a href="#" onclick="authMode('reg');return false">ثبت‌نام</a></div>
+    </div>
+  </div>
+
+  <!-- سفارش‌ها / پشتیبانی -->
+  <div class="purchase-view" id="subView">
+    <div class="view-header">
+      <button class="icon-btn" onclick="closeSub()"><i class="fa-solid fa-arrow-right"></i></button>
+      <div class="view-title" id="subTitle"></div><div style="width:40px"></div>
+    </div>
+    <div class="view-content" id="subBody"></div>
+  </div>
+
   <!-- مودال پیام اختصاصی -->
   <div class="modal-overlay" id="appAlert">
     <div class="modal-card">
@@ -863,10 +898,24 @@
 
 <script>
   // متغیرهای وضعیت برنامه
-  const API_URL = 'api.php';
+  const API_URL = 'https://rosavibe.ir/rosa/api.php';
   const CURRENT_APP_VERSION = 2; // نسخه اپلیکیشن برای بررسی آپدیت
 
-  let currentUser = JSON.parse(localStorage.getItem('rosa_user')) || { id: 1, name: 'فرشاد', balance: 0 };
+  let currentUser = JSON.parse(localStorage.getItem('rosa_user') || 'null') || { name: '', balance: 0 };
+  let TOKEN = localStorage.getItem('rosa_token') || '';
+
+  // تماس با سرور؛ توکن کاربر خودکار ارسال می‌شود
+  async function api(action, data = {}) {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, token: TOKEN, ...data })
+    });
+    const j = await res.json();
+    if (j.code === 'auth') { logoutUser(); }
+    return j;
+  }
+  const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let allServices = [];
   let selectedService = null;
   let activeCategory = 'all';
@@ -877,7 +926,42 @@
     updateUserUI();
     loadServices();
     checkForAppUpdate(false);
+    if (TOKEN) { document.getElementById('authView').classList.remove('open'); refreshMe(); }
   });
+
+  async function refreshMe() {
+    try {
+      const j = await api('me');
+      if (j.status === 'success') setSession(TOKEN, j.user);
+    } catch (e) {}
+  }
+  function setSession(token, user) {
+    TOKEN = token; currentUser = user;
+    localStorage.setItem('rosa_token', token);
+    localStorage.setItem('rosa_user', JSON.stringify(user));
+    updateUserUI();
+  }
+  function authMode(m) {
+    document.getElementById('regBox').style.display = m === 'reg' ? 'block' : 'none';
+    document.getElementById('loginBtn').style.display = m === 'reg' ? 'none' : 'flex';
+    document.getElementById('regBtn').style.display = m === 'reg' ? 'flex' : 'none';
+    document.getElementById('authSwitch').innerHTML = m === 'reg'
+      ? 'حساب دارید؟ <a href="#" onclick="authMode(\'login\');return false">ورود</a>'
+      : 'حساب ندارید؟ <a href="#" onclick="authMode(\'reg\');return false">ثبت‌نام</a>';
+  }
+  async function doAuth(isReg) {
+    const v = id => document.getElementById(id).value.trim();
+    try {
+      const j = isReg
+        ? await api('register', { username: v('authUser'), email: v('authEmail'), name: v('authName'), password: document.getElementById('authPass').value })
+        : await api('login', { identifier: v('authUser'), password: document.getElementById('authPass').value });
+      if (j.status === 'success') {
+        setSession(j.token, j.user);
+        document.getElementById('authPass').value = '';
+        document.getElementById('authView').classList.remove('open');
+      } else showModal('خطا', j.message, 'error');
+    } catch (e) { showModal('خطای سرور', 'ارتباط با سرور برقرار نشد.', 'error'); }
+  }
 
   // ۲. مدیریت تم شب / روز
   function initTheme() {
@@ -1036,18 +1120,7 @@
     }
 
     try {
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'submit_order',
-          user_id: currentUser.id,
-          service_id: selectedService.id,
-          link: link,
-          quantity: qty
-        })
-      });
-      const data = await res.json();
+      const data = await api('submit_order', { service_id: selectedService.id, link: link, quantity: qty });
 
       if (data.status === 'success') {
         currentUser.balance = data.new_balance;
@@ -1068,24 +1141,28 @@
     document.getElementById('chargeAmountInput').value = amt;
   }
 
-  function requestBankGateway() {
+  async function requestBankGateway() {
     const amt = parseInt(document.getElementById('chargeAmountInput').value);
     if (!amt || amt < 5000) {
-      showModal('مبلغ نامعتبر', 'حداقل مبلغ جهت اتصال به درگاه ۵,۰۰۰ تومان می‌باشد.', 'error');
+      showModal('مبلغ نامعتبر', 'حداقل مبلغ شارژ ۵,۰۰۰ تومان است.', 'error');
       return;
     }
-    showModal('انتقال به درگاه', `در حال هدایت به درگاه پرداخت شاپرک جهت شارژ ${amt.toLocaleString()} تومان...`, 'info');
+    const j = await api('create_ticket', { title: 'درخواست شارژ کیف پول', message: `درخواست شارژ ${amt.toLocaleString()} تومان` });
+    showModal(j.status === 'success' ? 'درخواست ثبت شد' : 'خطا', j.status === 'success' ? 'درخواست شارژ برای پشتیبانی ارسال شد. پس از تایید، موجودی شما افزایش می‌یابد. وضعیت را در بخش پشتیبانی ببینید.' : j.message, j.status === 'success' ? 'success' : 'error');
   }
 
   // ۸. ذخیره مشخصات پروفایل
-  function saveProfile() {
-    const name = document.getElementById('profileName').value.trim();
-    if (name) {
-      currentUser.name = name;
-      localStorage.setItem('rosa_user', JSON.stringify(currentUser));
-      updateUserUI();
-      showModal('موفقیت', 'مشخصات حساب شما با موفقیت ذخیره شد.', 'success');
-    }
+  async function saveProfile() {
+    const j = await api('update_profile', {
+      name: document.getElementById('profileName').value.trim(),
+      email: document.getElementById('profileEmail').value.trim(),
+      password: document.getElementById('profilePass').value
+    });
+    if (j.status === 'success') {
+      setSession(TOKEN, j.user);
+      document.getElementById('profilePass').value = '';
+      showModal('موفقیت', 'مشخصات حساب شما ذخیره شد.', 'success');
+    } else showModal('خطا', j.message, 'error');
   }
 
   function updateUserUI() {
@@ -1094,11 +1171,46 @@
     document.getElementById('headerBalance').innerText = Number(currentUser.balance || 0).toLocaleString();
     document.getElementById('walletBalanceBig').innerText = Number(currentUser.balance || 0).toLocaleString();
     document.getElementById('profileName').value = currentUser.name || '';
+    document.getElementById('profileEmail').value = currentUser.email || '';
   }
 
   function logoutUser() {
     localStorage.removeItem('rosa_user');
+    localStorage.removeItem('rosa_token');
     location.reload();
+  }
+
+  // سفارش‌های من و پشتیبانی
+  function closeSub() { document.getElementById('subView').classList.remove('open'); }
+  async function openOrders() {
+    document.getElementById('subTitle').innerText = 'سفارش‌های من';
+    const box = document.getElementById('subBody');
+    box.innerHTML = '<div style="text-align:center;padding:30px">در حال بارگذاری...</div>';
+    document.getElementById('subView').classList.add('open');
+    const j = await api('my_orders');
+    box.innerHTML = (j.data || []).map(o => `<div class="summary-card" style="display:block;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-weight:800;font-size:14px"><span>${esc(o.service_name)}</span><span style="font-size:12px;color:var(--primary)">${esc(o.status)}</span></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:6px;direction:ltr;text-align:right;word-break:break-all">${esc(o.target_link)}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:4px">تعداد: ${Number(o.quantity).toLocaleString()} • مبلغ: ${Number(o.amount).toLocaleString()} ت</div></div>`).join('')
+      || '<div style="text-align:center;padding:40px;color:var(--text-muted)">هنوز سفارشی ثبت نکرده‌اید.</div>';
+  }
+  async function openTickets() {
+    document.getElementById('subTitle').innerText = 'پشتیبانی';
+    const box = document.getElementById('subBody');
+    document.getElementById('subView').classList.add('open');
+    const j = await api('my_tickets');
+    box.innerHTML = `<div class="form-group"><label class="form-label">عنوان</label><div class="input-with-action"><input id="tkTitle" placeholder="موضوع پیام"></div></div>
+      <div class="form-group"><label class="form-label">پیام</label><div class="input-with-action"><input id="tkMsg" placeholder="متن پیام"></div></div>
+      <button class="submit-order-btn" style="width:100%;justify-content:center;margin-bottom:18px" onclick="sendTicket()"><span>ارسال تیکت</span></button>` +
+      ((j.data || []).map(t => `<div class="summary-card" style="display:block;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-weight:800;font-size:14px"><span>${esc(t.title)}</span><span style="font-size:12px;color:var(--primary)">${esc(t.status)}</span></div>
+        <div style="font-size:13px;margin-top:6px;white-space:pre-wrap">${esc(t.message)}</div>
+        ${t.reply ? `<div style="font-size:13px;margin-top:8px;color:#16a34a;white-space:pre-wrap"><b>پاسخ:</b> ${esc(t.reply)}</div>` : ''}</div>`).join('')
+        || '<div style="text-align:center;padding:20px;color:var(--text-muted)">تیکتی ندارید.</div>');
+  }
+  async function sendTicket() {
+    const j = await api('create_ticket', { title: document.getElementById('tkTitle').value, message: document.getElementById('tkMsg').value });
+    if (j.status === 'success') openTickets(); else showModal('خطا', j.message, 'error');
   }
 
   // ۹. بررسی آپدیت خودکار برنامه
@@ -1107,11 +1219,10 @@
       const res = await fetch(`${API_URL}?action=check_update&version_code=${CURRENT_APP_VERSION}`);
       const data = await res.json();
       if (data.status === 'success' && data.update_available) {
-        showModal(
-          `نسخه جدید منتشر شد (${data.version_name})`,
-          `${data.notes}\n\nجهت دانلود و نصب نسخه جدید کلیک کنید.`,
-          'info'
-        );
+        showModal(`نسخه جدید منتشر شد (${data.version_name})`, `${data.notes}`, 'info');
+        if (data.download_url && /^https:\/\//.test(data.download_url)) {
+          setTimeout(() => { if (confirm(`نسخه ${data.version_name} آماده است. اکنون به‌روزرسانی شود؟`)) location.href = data.download_url; }, 400);
+        }
       } else if (manual) {
         showModal('بروزرسانی', 'شما از آخرین نسخه برنامه استفاده می‌کنید.', 'success');
       }
