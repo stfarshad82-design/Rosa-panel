@@ -1,5 +1,6 @@
 {
-  "appId": "com.rosapanel.app",
-  "appName": "Rosa panel",
-  "webDir": "www"
+  "appId": "ir.rosavibe.panel",
+  "appName": "رزا پنل",
+  "webDir": "www",
+  "android": { "allowMixedContent": false }
 }
