@@ -40,6 +40,10 @@ jobs:
           sed "s/const CURRENT_APP_VERSION = [0-9]*;/const CURRENT_APP_VERSION = $VERSION_CODE;/" index.html > www/index.html
           npm install
           npx cap add android
+          if [ -f assets/icon.png ]; then
+            npm install --no-save @capacitor/assets
+            npx capacitor-assets generate --android --iconBackgroundColor '#0000ff' --iconBackgroundColorDark '#0000ff'
+          fi
           sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/; s/versionName \".*\"/versionName \"$VERSION_NAME\"/" android/app/build.gradle
           npx cap sync android
 
