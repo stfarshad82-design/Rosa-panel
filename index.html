@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Rose panel">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="theme-color" content="#0000ff">
   <title>رزا پنل | خدمات شبکه‌های اجتماعی</title>
   
   <!-- فونت وزیرمتن و آیکون‌های FontAwesome -->
@@ -48,6 +55,8 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
+
+    input, textarea { user-select: text; -webkit-user-select: text; }
 
     body {
       background: var(--bg-page);
@@ -690,13 +699,6 @@
     </div>
 
     <div class="form-group">
-      <div class="note-box">
-        <i class="fa-solid fa-triangle-exclamation" style="font-size: 18px; margin-top: 2px;"></i>
-        <div>شارژ کیف پول فعلاً از طریق درخواست به پشتیبانی انجام می‌شود؛ پس از تایید، موجودی شما افزایش می‌یابد.</div>
-      </div>
-    </div>
-
-    <div class="form-group">
       <label class="form-label">مبلغ شارژ (تومان)</label>
       <div class="input-with-action">
         <input type="number" id="chargeAmountInput" placeholder="مبلغ دلخواه را وارد کنید">
@@ -706,6 +708,9 @@
 
     <!-- شبکه دکمه‌های پرکاربرد شارژ شما -->
     <div class="quick-amount-grid">
+      <div class="amount-btn" onclick="setChargeAmount(10000)">۱۰,۰۰۰</div>
+      <div class="amount-btn" onclick="setChargeAmount(20000)">۲۰,۰۰۰</div>
+      <div class="amount-btn" onclick="setChargeAmount(50000)">۵۰,۰۰۰</div>
       <div class="amount-btn" onclick="setChargeAmount(100000)">۱۰۰,۰۰۰</div>
       <div class="amount-btn" onclick="setChargeAmount(200000)">۲۰۰,۰۰۰</div>
       <div class="amount-btn" onclick="setChargeAmount(500000)">۵۰۰,۰۰۰</div>
@@ -760,7 +765,7 @@
         <div><div class="w-title">پشتیبانی</div><div class="w-sub">ارسال تیکت و مشاهده پاسخ</div></div></div>
         <i class="fa-solid fa-chevron-left text-muted"></i>
       </div>
-      <div class="wide-feature-card" onclick="checkForAppUpdate(true)">
+      <div class="wide-feature-card" id="updateCard" onclick="checkForAppUpdate(true)">
         <div class="w-right">
           <div class="w-icon" style="background: #64748b;"><i class="fa-solid fa-rotate"></i></div>
           <div>
@@ -916,6 +921,7 @@
 <script>
   // متغیرهای وضعیت برنامه
   const API_URL = 'https://rosavibe.ir/rosa/api.php';
+  const IS_APP = !!window.Capacitor; // داخل اپ اندروید true، روی سایت false
   const CURRENT_APP_VERSION = 2; // نسخه اپلیکیشن برای بررسی آپدیت
 
   let currentUser = JSON.parse(localStorage.getItem('rosa_user') || 'null') || { name: '', balance: 0 };
@@ -942,7 +948,8 @@
     initTheme();
     updateUserUI();
     loadServices();
-    checkForAppUpdate(false);
+    if (IS_APP) checkForAppUpdate(false);
+    else { const u = document.getElementById('updateCard'); if (u) u.style.display = 'none'; }
     if (TOKEN) { document.getElementById('authView').classList.remove('open'); refreshMe(); }
   });
 
