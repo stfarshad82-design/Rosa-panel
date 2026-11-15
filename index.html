@@ -10,7 +10,9 @@
   <meta name="apple-mobile-web-app-title" content="Rose panel">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="theme-color" content="#0000ff">
-  <title>رزا پنل | خدمات شبکه‌های اجتماعی</title>
+  <title>رز پنل | خدمات شبکه‌های اجتماعی</title>
+  <meta name="description" content="رزا وایب (رز پنل) | خرید استارز، پرمیوم، ممبر، ری‌اکشن و خدمات شبکه‌های اجتماعی با کیف پول و پشتیبانی سریع">
+  <meta name="keywords" content="رزا وایب، رز پنل، rosavibe، خرید استارز تلگرام، پرمیوم تلگرام، ممبر تلگرام">
   
   <!-- فونت وزیرمتن و آیکون‌های FontAwesome -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -321,7 +323,7 @@
       overflow-y: auto;
       padding-bottom: 90px;
     }
-    .purchase-view.open { transform: translateX(0); }
+    .purchase-view.open { transform: none; }
     .view-header {
       padding: 16px 20px;
       display: flex;
@@ -598,6 +600,44 @@
     }
     .modal-overlay.active .modal-card { transform: scale(1); }
   </style>
+  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    .hero-slider-box { position: relative; border-radius: 24px; overflow: hidden; margin: 0 0 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); touch-action: pan-y; }
+    .hs-track { display: flex; direction: ltr; transition: transform 0.5s ease; will-change: transform; }
+    .hs-slide { flex: 0 0 100%; aspect-ratio: 2 / 1; background-size: cover; background-position: center; cursor: pointer; }
+    .hs-dots { position: absolute; bottom: 10px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; }
+    .hs-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); transition: all 0.3s; }
+    .hs-dot.on { background: #fff; width: 20px; border-radius: 6px; }
+
+    /* شماره مجازی */
+    .nav-fab-wrap.active .nav-fab { box-shadow: 0 0 0 5px rgba(56, 189, 248, 0.28), 0 10px 20px rgba(2, 132, 199, 0.4); }
+    .vn-hero { background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff; border-radius: 24px; padding: 20px; margin-bottom: 16px; box-shadow: 0 14px 25px -6px rgba(2, 132, 199, 0.35); }
+    .vn-hero b { font-size: 17px; display: block; margin-bottom: 6px; }
+    .vn-hero span { font-size: 12px; opacity: 0.92; line-height: 1.9; display: block; }
+    .vn-row.sel { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+    .vn-row.off { opacity: 0.5; cursor: not-allowed; }
+    .vn-price { font-weight: 900; color: var(--primary); font-size: 14px; white-space: nowrap; }
+    .vn-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 16px; margin-bottom: 14px; text-align: center; }
+    .vn-num { direction: ltr; font-size: 26px; font-weight: 900; letter-spacing: 1px; margin: 8px 0 12px; user-select: text; -webkit-user-select: text; }
+    .vn-code { direction: ltr; font-size: 34px; font-weight: 900; letter-spacing: 6px; color: var(--primary); margin: 8px 0 12px; user-select: text; -webkit-user-select: text; }
+    .vn-copy { background: var(--primary-light); color: var(--primary); border: 0; border-radius: 12px; padding: 9px 16px; font-weight: 700; cursor: pointer; font-size: 13px; margin: 0 3px; }
+    .vn-spin { width: 34px; height: 34px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: vnspin 1s linear infinite; margin: 6px auto 12px; }
+    @keyframes vnspin { to { transform: rotate(360deg); } }
+
+    /* نوار خرید شناور (کارت گرد ثابت پایین صفحه) */
+    .bottom-checkout-bar {
+      left: 12px;
+      right: 12px;
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      max-width: 456px;
+      margin: 0 auto;
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(2, 132, 199, 0.18);
+      padding: 12px 16px;
+    }
+    .purchase-view { padding-bottom: 120px; }
+  </style>
 </head>
 <body data-theme="light">
 
@@ -623,26 +663,10 @@
 
   <!-- ۲. تب اول: خانه (UI جدید) -->
   <main class="tab-content active" id="tab-home">
-    <div class="hero-banner">
-      <div class="hero-tag">سریع‌ترین راه دسترسی به خدمات مجازی</div>
-      <div class="hero-title">استارز و پرمیوم در چند ثانیه</div>
-      <div class="hero-desc">بدون پیچیدگی، با قیمت رقابتی و تحویل آنی</div>
-    </div>
+    <div id="heroBox" style="display:none"></div>
 
-    <div class="section-title"><span>خدمات ویژه</span></div>
-    
-    <div class="wide-feature-card" onclick="openServicesWithFilter('telegram')">
-      <div class="w-right">
-        <div class="w-icon" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);"><i class="fa-solid fa-gift"></i></div>
-        <div>
-          <div class="w-title">گیفت تلگرام <span class="badge-tag amber">جدید</span></div>
-          <div class="w-sub">ارسال گیفت استارزی برای دوستان</div>
-        </div>
-      </div>
-      <i class="fa-solid fa-chevron-left text-muted"></i>
-    </div>
-
-    <div class="wide-feature-card" onclick="openServicesWithFilter('telegram')">
+    <!-- کسب درآمد: ثابت، زیر اسلایدر -->
+    <div class="wide-feature-card" onclick="openReferral()">
       <div class="w-right">
         <div class="w-icon" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fa-solid fa-users"></i></div>
         <div>
@@ -653,19 +677,13 @@
       <i class="fa-solid fa-chevron-left text-muted"></i>
     </div>
 
-    <div class="section-title"><span>دسته‌بندی خدمات</span></div>
-    
-    <div class="services-grid">
-      <div class="grid-card" onclick="openServicesWithFilter('starz')">
-        <div class="grid-icon-box" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><i class="fa-solid fa-star"></i></div>
-        <div class="grid-title">خرید استارز</div>
-        <div class="grid-sub">ستاره تلگرام با قیمت رقابتی</div>
-      </div>
-      <div class="grid-card" onclick="openServicesWithFilter('premium')">
-        <div class="grid-icon-box" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);"><i class="fa-solid fa-award"></i></div>
-        <div class="grid-title">تلگرام پرمیوم</div>
-        <div class="grid-sub">اشتراک رسمی ۳، ۶ و ۱۲ ماهه</div>
-      </div>
+    <!-- کارت‌های پهن (مثل پشتیبانی): زیر کسب درآمد، از پنل مدیریت -->
+    <div id="wideCards"></div>
+
+    <!-- کارت‌های دسته‌بندی: فقط از پنل مدیریت (تب «صفحه‌ی اصلی») ساخته می‌شوند -->
+    <div id="svcSection" style="display:none">
+      <div class="section-title"><span id="svcTitle">دسته‌بندی خدمات</span></div>
+      <div class="services-grid" id="svcGrid"></div>
     </div>
   </main>
 
@@ -689,6 +707,27 @@
     <div id="servicesListContainer">
       <!-- کارت‌های سرویس به صورت داینامیک توسط JS اینجا درج می‌شوند -->
     </div>
+  </section>
+
+  <!-- تب شماره مجازی -->
+  <section class="tab-content" id="tab-virtual">
+    <div class="vn-hero">
+      <b><i class="fa-solid fa-sim-card"></i> شماره مجازی</b>
+      <span>شماره‌ی موقت برای ثبت‌نام و دریافت کد تأیید تلگرام، واتساپ و سایر سرویس‌ها. کد به‌صورت خودکار همین‌جا نمایش داده می‌شود.</span>
+    </div>
+    <div class="wide-feature-card" onclick="openVnOrders()">
+      <div class="w-right">
+        <div class="w-icon" style="background:#8b5cf6"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div><div class="w-title">شماره‌های من</div><div class="w-sub">پیگیری کد و سوابق خرید شماره</div></div>
+      </div>
+      <i class="fa-solid fa-chevron-left text-muted"></i>
+    </div>
+    <div class="section-title"><span>انتخاب سرویس</span></div>
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass text-muted"></i>
+      <input type="text" id="vnSearch" placeholder="جستجوی سرویس..." oninput="renderVnApps()">
+    </div>
+    <div id="vnApps"></div>
   </section>
 
   <!-- ۴. تب سوم: کیف پول نوسازی‌شده -->
@@ -719,9 +758,10 @@
       <div class="amount-btn" onclick="setChargeAmount(5000000)">۵,۰۰۰,۰۰۰</div>
     </div>
 
+    <div id="gatewayBox"></div>
     <button class="submit-order-btn" style="width: 100%; justify-content: center; margin-top: 15px;" onclick="requestBankGateway()">
       <i class="fa-solid fa-lock"></i>
-      <span>ارسال درخواست شارژ</span>
+      <span>ادامه پرداخت</span>
     </button>
   </section>
 
@@ -755,6 +795,16 @@
     </button>
 
     <div style="margin-top: 35px;">
+      <div class="wide-feature-card" onclick="openReferral()">
+        <div class="w-right"><div class="w-icon" style="background:#10b981"><i class="fa-solid fa-users"></i></div>
+        <div><div class="w-title">کسب درآمد و دعوت</div><div class="w-sub">لینک دعوت، پاداش و لیست دعوت‌شده‌ها</div></div></div>
+        <i class="fa-solid fa-chevron-left text-muted"></i>
+      </div>
+      <div class="wide-feature-card" onclick="openTopups()">
+        <div class="w-right"><div class="w-icon" style="background:#f59e0b"><i class="fa-solid fa-receipt"></i></div>
+        <div><div class="w-title">سوابق شارژ</div><div class="w-sub">وضعیت فیش‌ها و درخواست‌های شارژ</div></div></div>
+        <i class="fa-solid fa-chevron-left text-muted"></i>
+      </div>
       <div class="wide-feature-card" onclick="openOrders()">
         <div class="w-right"><div class="w-icon" style="background:#0ea5e9"><i class="fa-solid fa-list-check"></i></div>
         <div><div class="w-title">سفارش‌های من</div><div class="w-sub">پیگیری وضعیت سفارش‌ها</div></div></div>
@@ -776,7 +826,7 @@
         <i class="fa-solid fa-chevron-left text-muted"></i>
       </div>
 
-      <div class="wide-feature-card" onclick="logoutUser()" style="border-color: #fca5a5;">
+      <div class="wide-feature-card" onclick="confirmLogout()" style="border-color: #fca5a5;">
         <div class="w-right">
           <div class="w-icon" style="background: #ef4444;"><i class="fa-solid fa-right-from-bracket"></i></div>
           <div>
@@ -851,7 +901,7 @@
         <span class="c-label">مبلغ کل پرداختی</span>
         <span class="c-amount"><span id="totalOrderPrice">۰</span> ت</span>
       </div>
-      <button class="submit-order-btn" onclick="submitFinalOrder()">
+      <button class="submit-order-btn" onclick="confirmOrderPrompt()">
         <i class="fa-solid fa-cart-shopping"></i>
         <span>ثبت و تایید سفارش</span>
       </button>
@@ -864,11 +914,11 @@
       <i class="fa-solid fa-house"></i>
       <span>خانه</span>
     </div>
-    <div class="nav-item" id="nav-services" onclick="switchTab('services')">
-      <i class="fa-solid fa-layer-group"></i>
-      <span>خدمات</span>
+    <div class="nav-item" id="nav-virtual" onclick="openVirtualTab()">
+      <i class="fa-solid fa-sim-card"></i>
+      <span>شماره مجازی</span>
     </div>
-    <div class="nav-fab-wrap" onclick="switchTab('services')">
+    <div class="nav-fab-wrap" id="navFab" onclick="switchTab('services')">
       <div class="nav-fab"><i class="fa-solid fa-plus"></i></div>
     </div>
     <div class="nav-item" id="nav-wallet" onclick="switchTab('wallet')">
@@ -882,10 +932,12 @@
   </nav>
 
   <!-- ورود / ثبت‌نام -->
-  <div class="purchase-view open" id="authView" style="z-index:150">
-    <div class="view-header"><div style="width:40px"></div><div class="view-title">ورود به رزا پنل</div><div style="width:40px"></div></div>
+  <div class="purchase-view" id="authView" style="z-index:150">
+    <div class="view-header"><button class="icon-btn" onclick="closeAuth()"><i class="fa-solid fa-arrow-right"></i></button><div class="view-title">ورود به رز پنل</div><div style="width:40px"></div></div>
     <div class="view-content">
+      <div id="authHint" style="background:var(--bg-card-soft);border-radius:14px;padding:12px;font-size:13px;line-height:1.9;margin-bottom:16px;color:var(--text-muted)"></div>
       <div id="regBox" style="display:none">
+        <div class="form-group"><label class="form-label">کد معرف (اختیاری)</label><div class="input-with-action"><input id="authRef" dir="ltr" autocapitalize="characters" placeholder="مثلاً AB12CD"></div></div>
         <div class="form-group"><label class="form-label">نام</label><div class="input-with-action"><input id="authName" placeholder="نام شما"></div></div>
         <div class="form-group"><label class="form-label">ایمیل (جیمیل)</label><div class="input-with-action"><input id="authEmail" type="email" dir="ltr" placeholder="example@gmail.com"></div></div>
       </div>
@@ -906,6 +958,115 @@
     <div class="view-content" id="subBody"></div>
   </div>
 
+  <!-- صفحه کارت به کارت -->
+  <div class="purchase-view" id="cardView">
+    <div class="view-header">
+      <button class="icon-btn" onclick="closeCard()"><i class="fa-solid fa-arrow-right"></i></button>
+      <div class="view-title">پرداخت کارت به کارت</div><div style="width:40px"></div>
+    </div>
+    <div class="view-content">
+      <div style="background:var(--primary);color:#fff;border-radius:22px;padding:22px 20px;margin-bottom:16px">
+        <div style="font-size:12px;opacity:.85" id="cardBank"></div>
+        <div style="font-size:21px;font-weight:800;letter-spacing:1px;direction:ltr;text-align:center;margin:14px 0" id="cardNo"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:8px">
+          <span id="cardHolder"></span>
+          <button onclick="copyCardNo()" style="background:rgba(255,255,255,.22);color:#fff;border:0;border-radius:12px;padding:8px 14px;font-weight:700;cursor:pointer"><i class="fa-solid fa-copy"></i> کپی شماره</button>
+        </div>
+      </div>
+      <div style="background:var(--bg-card);border-radius:18px;padding:16px;text-align:center;margin-bottom:16px">
+        <div style="font-size:12px;color:var(--text-muted)">مبلغ واریز</div>
+        <div id="cardAmount" style="font-size:22px;font-weight:800;margin-top:4px"></div>
+      </div>
+      <div id="cardNote" style="font-size:13px;line-height:1.9;color:var(--text-muted);margin-bottom:16px;white-space:pre-line"></div>
+      <div class="form-group"><label class="form-label">تصویر فیش واریزی</label>
+        <label style="display:block;border:1.5px dashed var(--primary);border-radius:16px;padding:18px;text-align:center;cursor:pointer">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <div id="receiptName" style="font-size:13px;margin-top:6px">هیچ فایلی انتخاب نشده</div>
+          <input type="file" id="receiptFile" accept="image/*" style="display:none" onchange="receiptChosen()">
+        </label>
+      </div>
+      <button id="sendTopupBtn" class="submit-order-btn" style="width:100%;justify-content:center" onclick="sendTopup()"><span>ارسال فیش</span></button>
+    </div>
+  </div>
+
+  <!-- اتصال حساب در تلگرام -->
+  <div class="purchase-view" id="tgView" style="z-index:200">
+    <div class="view-header"><div style="width:40px"></div><div class="view-title">ورود با تلگرام</div><div style="width:40px"></div></div>
+    <div class="view-content">
+      <div style="text-align:center;margin:10px 0 22px">
+        <div style="font-size:15px;font-weight:800;margin-bottom:8px">سلام <span id="tgName"></span></div>
+        <div style="font-size:13px;line-height:1.9;color:var(--text-muted)">برای استفاده از رز پنل در تلگرام، یکی از دو گزینه‌ی زیر را انتخاب کن. اگر قبلاً در سایت یا اپ ثبت‌نام کرده‌ای، می‌توانی همان حساب را وصل کنی تا موجودی و سفارش‌هایت یکی باشد.</div>
+      </div>
+      <div id="tgChoice">
+        <button class="submit-order-btn" style="width:100%;justify-content:center;margin-bottom:12px" onclick="tgCreate()"><span>ساخت حساب جدید</span></button>
+        <button class="submit-order-btn" style="width:100%;justify-content:center;background:var(--bg-card);color:inherit;border:1px solid var(--border-color)" onclick="tgShowForm()"><span>اتصال به حساب قبلی</span></button>
+      </div>
+      <div id="tgForm" style="display:none">
+        <div class="form-group"><label class="form-label">نام کاربری یا ایمیل</label><div class="input-with-action"><input id="tgIdent" dir="ltr" autocapitalize="none"></div></div>
+        <div class="form-group"><label class="form-label">رمز عبور</label><div class="input-with-action"><input id="tgPass" type="password" dir="ltr"></div></div>
+        <button class="submit-order-btn" style="width:100%;justify-content:center" onclick="tgLink()"><span>اتصال و ورود</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- شماره مجازی: انتخاب کشور -->
+  <div class="purchase-view" id="vnCountryView" style="z-index:105">
+    <div class="view-header">
+      <button class="icon-btn" onclick="closeVnCountry()"><i class="fa-solid fa-arrow-right"></i></button>
+      <div class="view-title" id="vnCountryTitle">انتخاب کشور</div>
+      <div style="width:40px"></div>
+    </div>
+    <div class="view-content">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+        <input type="text" id="vnCSearch" placeholder="جستجوی کشور..." oninput="renderVnCountries()">
+      </div>
+      <div id="vnCountries"></div>
+    </div>
+    <div class="bottom-checkout-bar">
+      <div class="checkout-total">
+        <span class="c-label" id="vnSelLabel">کشوری انتخاب نشده</span>
+        <span class="c-amount"><span id="vnSelPrice">۰</span> ت</span>
+      </div>
+      <button class="submit-order-btn" id="vnBuyBtn" onclick="vnConfirmBuy()">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>خرید شماره</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- شماره مجازی: شماره و کد -->
+  <div class="purchase-view" id="vnOrderView" style="z-index:110">
+    <div class="view-header">
+      <button class="icon-btn" onclick="closeVnOrder()"><i class="fa-solid fa-arrow-right"></i></button>
+      <div class="view-title">شماره‌ی شما</div>
+      <div style="width:40px"></div>
+    </div>
+    <div class="view-content" id="vnOrderBody"></div>
+  </div>
+
+  <!-- شماره موبایل برای پرداخت آنلاین -->
+  <div id="dpPhone" style="display:none;position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:20px">
+    <div style="background:var(--bg-card);border-radius:24px;padding:22px;width:100%;max-width:380px">
+      <div style="font-weight:800;font-size:16px;margin-bottom:6px">شماره موبایل</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.9;margin-bottom:12px">درگاه دیجی‌پی برای پرداخت به شماره‌ی موبایل شما نیاز دارد (مثلاً 09121234567).</div>
+      <div class="input-with-action"><input type="tel" id="dpCell" inputmode="numeric" maxlength="11" dir="ltr" placeholder="09xxxxxxxxx"></div>
+      <button class="submit-order-btn" style="width:100%;justify-content:center;margin-top:14px" onclick="dpPhoneOk()"><span>ادامه به درگاه پرداخت</span></button>
+      <button onclick="dpPhoneClose()" style="width:100%;background:none;border:0;color:var(--text-muted);margin-top:8px;padding:8px;cursor:pointer;font-family:inherit">انصراف</button>
+    </div>
+  </div>
+
+  <!-- پنجره‌ی تایید داخلی -->
+  <div id="confirmBox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;align-items:center;justify-content:center;padding:24px">
+    <div style="background:var(--bg-card);border-radius:20px;padding:22px 18px;width:100%;max-width:340px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.35)">
+      <div id="confirmText" style="font-weight:800;font-size:15px;line-height:1.9;margin-bottom:18px"></div>
+      <div style="display:flex;gap:10px">
+        <button id="confirmNo" style="flex:1;padding:12px;border-radius:14px;border:1px solid var(--border-color);background:transparent;color:inherit;font-weight:700;font-size:14px;cursor:pointer">انصراف</button>
+        <button id="confirmYes" style="flex:1;padding:12px;border-radius:14px;border:0;background:#ef4444;color:#fff;font-weight:700;font-size:14px;cursor:pointer">خروج</button>
+      </div>
+    </div>
+  </div>
+
   <!-- مودال پیام اختصاصی -->
   <div class="modal-overlay" id="appAlert">
     <div class="modal-card">
@@ -922,10 +1083,45 @@
   // متغیرهای وضعیت برنامه
   const API_URL = 'https://rosavibe.ir/rosa/api.php';
   const IS_APP = !!window.Capacitor; // داخل اپ اندروید true، روی سایت false
-  const CURRENT_APP_VERSION = 2; // نسخه اپلیکیشن برای بررسی آپدیت
+  const CURRENT_APP_VERSION = 6; // نسخه اپلیکیشن برای بررسی آپدیت
 
   let currentUser = JSON.parse(localStorage.getItem('rosa_user') || 'null') || { name: '', balance: 0 };
   let TOKEN = localStorage.getItem('rosa_token') || '';
+  let wantOrder = false; // بعد از ورود، سفارش نیمه‌کاره خودکار ثبت شود؟
+  const SITE_URL = 'https://rosavibe.ir/';
+  // کد معرف از لینک دعوت ذخیره می‌شود تا هنگام ثبت‌نام استفاده شود
+  (function () {
+    const q = new URLSearchParams(location.search).get('ref');
+    if (q) localStorage.setItem('rosa_ref', q.trim().toUpperCase().slice(0, 12));
+  })();
+
+  function openAuth(hint, resumeOrder = false) {
+    wantOrder = resumeOrder;
+    document.getElementById('authHint').innerText = hint;
+    document.getElementById('authView').classList.add('open');
+  }
+  function closeAuth() {
+    wantOrder = false;
+    document.getElementById('authView').classList.remove('open');
+  }
+  function needLogin() {
+    if (TOKEN) return false;
+    openAuth('برای استفاده از این بخش ابتدا ثبت‌نام یا ورود کنید.');
+    return true;
+  }
+  function askConfirm(text, yesText, onYes, color) {
+    document.getElementById('confirmText').innerText = text;
+    document.getElementById('confirmYes').innerText = yesText;
+    document.getElementById('confirmYes').style.background = color || '#ef4444';
+    document.getElementById('confirmBox').style.display = 'flex';
+    document.getElementById('confirmYes').onclick = () => { closeConfirm(); onYes(); };
+    document.getElementById('confirmNo').onclick = closeConfirm;
+  }
+  function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; }
+  function confirmLogout() {
+    if (!TOKEN) { openAuth('شما هنوز وارد حساب نشده‌اید.'); return; }
+    askConfirm('مطمئنی که می‌خواهی از حساب خارج شوی؟', 'خروج', logoutUser);
+  }
 
   // تماس با سرور؛ توکن کاربر خودکار ارسال می‌شود
   async function api(action, data = {}) {
@@ -935,7 +1131,7 @@
       body: JSON.stringify({ action, token: TOKEN, ...data })
     });
     const j = await res.json();
-    if (j.code === 'auth') { logoutUser(); }
+    if (j.code === 'auth' && TOKEN) { logoutUser(); }
     return j;
   }
   const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -948,9 +1144,12 @@
     initTheme();
     updateUserUI();
     loadServices();
+    loadCategoryChips();
+    loadHome();
     if (IS_APP) checkForAppUpdate(false);
     else { const u = document.getElementById('updateCard'); if (u) u.style.display = 'none'; }
-    if (TOKEN) { document.getElementById('authView').classList.remove('open'); refreshMe(); }
+    if (tgInit()) { /* ورود از تلگرام انجام می‌شود */ }
+    else if (TOKEN) { document.getElementById('authView').classList.remove('open'); refreshMe(); }
   });
 
   async function refreshMe() {
@@ -963,6 +1162,7 @@
     TOKEN = token; currentUser = user;
     localStorage.setItem('rosa_token', token);
     localStorage.setItem('rosa_user', JSON.stringify(user));
+    loadGateways();
     updateUserUI();
   }
   function authMode(m) {
@@ -977,12 +1177,15 @@
     const v = id => document.getElementById(id).value.trim();
     try {
       const j = isReg
-        ? await api('register', { username: v('authUser'), email: v('authEmail'), name: v('authName'), password: document.getElementById('authPass').value })
+        ? await api('register', { username: v('authUser'), email: v('authEmail'), name: v('authName'), password: document.getElementById('authPass').value, ref_code: (v('authRef') || localStorage.getItem('rosa_ref') || '').toUpperCase() })
         : await api('login', { identifier: v('authUser'), password: document.getElementById('authPass').value });
       if (j.status === 'success') {
         setSession(j.token, j.user);
         document.getElementById('authPass').value = '';
         document.getElementById('authView').classList.remove('open');
+        const resume = wantOrder;
+        wantOrder = false;
+        if (resume) submitFinalOrder();
       } else showModal('خطا', j.message, 'error');
     } catch (e) { showModal('خطای سرور', 'ارتباط با سرور برقرار نشد.', 'error'); }
   }
@@ -1009,6 +1212,8 @@
 
     const nav = document.getElementById('nav-' + tabId);
     if (nav) nav.classList.add('active');
+    const fab = document.getElementById('navFab');
+    if (fab) fab.classList.toggle('active', tabId === 'services');
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -1040,6 +1245,14 @@
     }
   }
 
+  // خط قیمت زیر هر سرویس: از روی قیمت محصول ساخته می‌شود، نه متن دستی
+  function priceLine(s) {
+    const p = Number(s.price_per_unit) || 0;
+    if (p <= 0) return s.subtitle || '';
+    const txt = p.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    return `از ${txt} ت برای هر واحد`;
+  }
+
   function renderServicesList() {
     const container = document.getElementById('servicesListContainer');
     const searchVal = document.getElementById('serviceSearch').value.trim().toLowerCase();
@@ -1064,12 +1277,26 @@
               <span>${s.title}</span>
               ${s.badge_text ? `<span class="badge-tag ${s.badge_color || 'purple'}">${s.badge_text}</span>` : ''}
             </div>
-            <div class="w-sub">${s.subtitle || ''}</div>
+            <div class="w-sub">${priceLine(s)}</div>
           </div>
         </div>
         <i class="fa-solid fa-chevron-left text-muted"></i>
       </div>
     `).join('');
+  }
+
+  // دسته‌ها از پنل مدیریت خوانده می‌شوند، نه ثابت در کد
+  async function loadCategoryChips() {
+    try {
+      const r = await fetch(`${API_URL}?action=get_categories`);
+      const j = await r.json();
+      if (j.status !== 'success' || !Array.isArray(j.data)) return;
+      const box = document.querySelector('.chips-slider');
+      if (!box) return;
+      if (activeCategory !== 'all' && !j.data.find(c => c.slug === activeCategory)) activeCategory = 'all';
+      box.innerHTML = `<button class="chip-btn ${activeCategory === 'all' ? 'active' : ''}" onclick="setCategoryFilter('all', this)">همه</button>` +
+        j.data.map(c => `<button class="chip-btn ${activeCategory === c.slug ? 'active' : ''}" onclick="setCategoryFilter('${esc(c.slug)}', this)">${esc(c.title)}</button>`).join('');
+    } catch (e) {}
   }
 
   function setCategoryFilter(cat, btn = null) {
@@ -1155,8 +1382,124 @@
   }
 
   // ۶. ثبت سفارش نهایی
+  // ===== پنجره‌ی تأیید نهایی سفارش + جلوگیری از دوبار ثبت =====
+  let ordBusy = false;
+  function confirmOrderPrompt() {
+    if (ordBusy || !selectedService) return;
+    const link = document.getElementById('targetLinkInput').value.trim();
+    const qty = parseInt(document.getElementById('qtyInput').value) || 0;
+    const total = document.getElementById('totalOrderPrice').innerText;
+    if (!link) { showModal('خطا', 'لطفاً لینک یا آیدی مقصد را وارد نمایید.', 'error'); return; }
+    document.getElementById('confirmText').style.whiteSpace = 'pre-line';
+    askConfirm(`از ثبت این سفارش مطمئنی؟\n\nسرویس: ${selectedService.title}\nتعداد: ${qty.toLocaleString()}\nمقصد: ${link}\nمبلغ کل: ${total} تومان`, 'ثبت سفارش', () => {
+      ordBusy = true;
+      const btn = document.querySelector('[onclick="confirmOrderPrompt()"]');
+      if (btn) btn.disabled = true;
+      Promise.resolve(submitFinalOrder()).finally(() => { ordBusy = false; if (btn) btn.disabled = false; });
+    });
+  }
+
+  // ===== صفحه‌ی اصلی: اسلایدر و دسته‌بندی خدمات (از پنل مدیریت) =====
+  let HOME = (() => { try { return JSON.parse(localStorage.getItem('rosa_home') || 'null'); } catch (e) { return null; } })();
+  let HS_LINKS = [], SVC_LINKS = [], slideIdx = 0, slideN = 0, slideTimer = null, slideHold = false, hsSwiped = false;
+  async function loadHome() {
+    renderHome();
+    try {
+      const r = await fetch(API_URL.replace('api.php', 'extras.php') + '?action=home');
+      const j = await r.json();
+      if (j.status === 'success' && j.home) {
+        HOME = j.home;
+        try { const t = JSON.stringify(j.home); if (t.length < 1500000) localStorage.setItem('rosa_home', t); else localStorage.removeItem('rosa_home'); } catch (e) {}
+        renderHome();
+      }
+    } catch (e) {}
+  }
+  // هر چه در پنل مدیریت نباشد، در صفحه هم نیست: اسلایدر خالی = مخفی، کارت‌های خالی = بخش مخفی
+  function renderHome() {
+    const h = HOME || {};
+    const slides = (h.slider || []).filter(x => x.image);
+    const box = document.getElementById('heroBox');
+    if (slides.length) {
+      box.style.display = '';
+      renderSlider(slides, Math.max(2, Math.min(15, Number(h.seconds) || 4)));
+    } else {
+      clearInterval(slideTimer); slideN = 0;
+      box.className = ''; box.innerHTML = ''; box.style.display = 'none';
+    }
+    const svc = (h.services || []).filter(x => x.enabled !== false);
+    const sec = document.getElementById('svcSection');
+    renderServiceCards(svc, h.services_title);
+    sec.style.display = svc.some(x => !x.wide) ? '' : 'none';
+  }
+  function renderSlider(slides, secs) {
+    const box = document.getElementById('heroBox');
+    if (!box) return;
+    HS_LINKS = slides.map(s => s.link || { type: 'none' });
+    box.className = 'hero-slider-box';
+    box.innerHTML = `<div class="hs-track" id="hsTrack">${slides.map((s, i) => `<div class="hs-slide" style="background-image:url('${s.image.replace(/'/g, '%27')}')" onclick="openHomeLink(${i})"></div>`).join('')}</div>
+      <div class="hs-dots">${slides.map((_, i) => `<span class="hs-dot ${i === 0 ? 'on' : ''}"></span>`).join('')}</div>`;
+    slideN = slides.length; slideIdx = 0;
+    const track = document.getElementById('hsTrack');
+    let startX = null;
+    track.addEventListener('pointerdown', e => { startX = e.clientX; slideHold = true; hsSwiped = false; });
+    track.addEventListener('pointerup', e => {
+      slideHold = false;
+      if (startX !== null && Math.abs(e.clientX - startX) > 40) { hsSwiped = true; goSlide(slideIdx + (e.clientX < startX ? 1 : -1)); }
+      startX = null;
+    });
+    track.addEventListener('pointerleave', () => { slideHold = false; startX = null; });
+    clearInterval(slideTimer);
+    if (slideN > 1) slideTimer = setInterval(() => { if (!slideHold) goSlide(slideIdx + 1); }, secs * 1000);
+  }
+  function goSlide(i) {
+    if (!slideN) return;
+    slideIdx = ((i % slideN) + slideN) % slideN;
+    const track = document.getElementById('hsTrack');
+    if (track) track.style.transform = `translateX(-${slideIdx * 100}%)`;
+    document.querySelectorAll('.hs-dot').forEach((d, k) => d.classList.toggle('on', k === slideIdx));
+  }
+  function openLinkObj(l) {
+    l = l || { type: 'none' };
+    if (l.type === 'service' && l.id) return openPurchaseView(l.id);
+    if (l.type === 'category' && l.slug) return openServicesWithFilter(l.slug);
+    if (l.type === 'virtual') return openVirtualTab();
+    if (l.type === 'tickets') return openTickets();
+    if (l.type === 'url' && l.url) window.open(l.url, '_blank');
+  }
+  function openHomeLink(i) {
+    if (hsSwiped) { hsSwiped = false; return; }
+    openLinkObj(HS_LINKS[i]);
+  }
+  function openSvcCard(i) { openLinkObj(SVC_LINKS[i]); }
+  function renderServiceCards(list, title) {
+    const grid = document.getElementById('svcGrid');
+    const t = document.getElementById('svcTitle');
+    if (t && title) t.innerText = title;
+    if (!grid) return;
+    SVC_LINKS = list.map(x => x.link || { type: 'none' });
+    const wideBox = document.getElementById('wideCards');
+    const cl = c => String(c || 'linear-gradient(135deg, #0ea5e9, #0284c7)').replace(/"/g, '');
+    const ic = n => String(n || 'fa-star').replace(/[^a-z\-]/g, '');
+    if (wideBox) wideBox.innerHTML = list.map((x, i) => !x.wide ? '' : `<div class="wide-feature-card" onclick="openSvcCard(${i})">
+        <div class="w-right">
+          <div class="w-icon" style="background: ${cl(x.color)};"><i class="fa-solid ${ic(x.icon)}"></i></div>
+          <div><div class="w-title">${esc(x.title)}</div><div class="w-sub">${esc(x.sub || '')}</div></div>
+        </div>
+        <i class="fa-solid fa-chevron-left text-muted"></i>
+      </div>`).join('');
+    grid.innerHTML = list.map((x, i) => x.wide ? '' : `<div class="grid-card" onclick="openSvcCard(${i})">
+        <div class="grid-icon-box" style="background: ${String(x.color || 'linear-gradient(135deg, #0ea5e9, #0284c7)').replace(/"/g, '')};"><i class="fa-solid ${String(x.icon || 'fa-star').replace(/[^a-z\-]/g, '')}"></i></div>
+        <div class="grid-title">${esc(x.title)}</div>
+        <div class="grid-sub">${esc(x.sub || '')}</div>
+      </div>`).join('');
+  }
+
   async function submitFinalOrder() {
     if (!selectedService) return;
+    if (!TOKEN) {
+      openAuth('برای ثبت سفارش، ابتدا ثبت‌نام یا ورود کنید. بعد از ورود، سفارش شما به‌طور خودکار ثبت می‌شود.', true);
+      return;
+    }
     const link = document.getElementById('targetLinkInput').value.trim();
     const qty = parseInt(document.getElementById('qtyInput').value) || 0;
 
@@ -1191,18 +1534,297 @@
     document.getElementById('chargeAmountInput').value = amt;
   }
 
+  let GATEWAYS = [], selGw = null, cardAmt = 0, REF_LINK = '';
+
+  async function loadGateways() {
+    if (!TOKEN) { renderGateways(); return; }
+    const j = await api('get_gateways');
+    GATEWAYS = j.status === 'success' ? (j.data || []) : [];
+    try {
+      const d = await api('dp_info');
+      if (d.status === 'success' && d.enabled) GATEWAYS.push({ id: 'dp', type: 'digipay', title: 'پرداخت آنلاین (دیجی‌پی)', note: 'پرداخت امن و شارژ آنی کیف پول', logo_url: '', min_amount: d.min, max_amount: d.max });
+    } catch (e) {}
+    if (!selGw || !GATEWAYS.find(g => g.id == selGw.id)) selGw = GATEWAYS[0] || null;
+    renderGateways();
+  }
+  function pickGateway(id) {
+    selGw = GATEWAYS.find(g => g.id == id) || null;
+    renderGateways();
+  }
+  function renderGateways() {
+    const box = document.getElementById('gatewayBox');
+    if (!box) return;
+    if (!TOKEN) { box.innerHTML = '<div style="font-size:13px;color:var(--text-muted);margin:14px 0">برای مشاهده‌ی روش‌های پرداخت، ابتدا وارد شوید.</div>'; return; }
+    if (!GATEWAYS.length) { box.innerHTML = '<div style="font-size:13px;color:var(--text-muted);margin:14px 0">در حال حاضر روش پرداخت فعالی وجود ندارد.</div>'; return; }
+    box.innerHTML = '<div class="form-label" style="margin:16px 0 8px">روش پرداخت</div>' + GATEWAYS.map(g => {
+      const on = selGw && selGw.id == g.id;
+      const logo = g.logo_url
+        ? `<img src="${esc(g.logo_url)}" alt="" style="width:44px;height:44px;border-radius:12px;object-fit:contain;background:#fff">`
+        : `<div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-credit-card" style="font-size:20px"></i></div>`;
+      return `<div onclick="pickGateway('${g.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;margin-bottom:10px;cursor:pointer;background:${on ? 'var(--primary)' : 'var(--bg-card)'};color:${on ? '#fff' : 'inherit'};border:1.5px solid ${on ? 'var(--primary)' : 'var(--border-color)'}">
+        ${logo}
+        <div style="flex:1"><div style="font-weight:800;font-size:14px">${esc(g.title)}</div><div style="font-size:12px;opacity:.85">${esc(g.note || '')}</div></div>
+        <i class="fa-solid ${on ? 'fa-circle-check' : 'fa-circle'}"></i>
+      </div>`;
+    }).join('');
+  }
+
+  // دکمه‌ی «ادامه پرداخت» کیف پول
   async function requestBankGateway() {
-    const amt = parseInt(document.getElementById('chargeAmountInput').value);
-    if (!amt || amt < 5000) {
-      showModal('مبلغ نامعتبر', 'حداقل مبلغ شارژ ۵,۰۰۰ تومان است.', 'error');
+    if (needLogin()) return;
+    if (!selGw) { showModal('روش پرداخت', 'یک روش پرداخت انتخاب کنید.', 'error'); return; }
+    const amt = parseInt(document.getElementById('chargeAmountInput').value) || 0;
+    const min = Number(selGw.min_amount), max = Number(selGw.max_amount);
+    if (amt < min || (max > 0 && amt > max)) {
+      showModal('مبلغ نامعتبر', `مبلغ این روش باید بین ${min.toLocaleString()} تا ${max > 0 ? max.toLocaleString() : 'نامحدود'} تومان باشد.`, 'error');
       return;
     }
-    const j = await api('create_ticket', { title: 'درخواست شارژ کیف پول', message: `درخواست شارژ ${amt.toLocaleString()} تومان` });
-    showModal(j.status === 'success' ? 'درخواست ثبت شد' : 'خطا', j.status === 'success' ? 'درخواست شارژ برای پشتیبانی ارسال شد. پس از تایید، موجودی شما افزایش می‌یابد. وضعیت را در بخش پشتیبانی ببینید.' : j.message, j.status === 'success' ? 'success' : 'error');
+    if (selGw.type === 'digipay') { startDigipay(amt); return; }
+    openCardPage(amt);
+  }
+
+  /* ===== پرداخت آنلاین دیجی‌پی ===== */
+  let DP_AMT = 0;
+  const dpDigits = s => String(s || '').replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+  async function startDigipay(amt, cell) {
+    DP_AMT = amt;
+    cell = dpDigits(cell || localStorage.getItem('rosa_cell') || '').replace(/\D/g, '');
+    if (cell.length === 10 && cell[0] === '9') cell = '0' + cell;
+    if (!/^09\d{9}$/.test(cell)) { dpAskPhone(); return; }
+    try {
+      const j = await api('dp_start', { amount: amt, cell });
+      if (j.status === 'success' && j.url) {
+        localStorage.setItem('rosa_cell', cell);
+        try { sessionStorage.setItem('dp_pending', JSON.stringify({ bal: currentUser ? Number(currentUser.balance) : 0, t: Date.now() })); } catch (e) {}
+        location.href = j.url;
+        return;
+      }
+      if (j.code === 'need_phone') { dpAskPhone(); return; }
+      showModal('خطا', j.message || 'اتصال به درگاه ممکن نشد.', 'error');
+    } catch (e) { showModal('خطای ارتباط', 'ارتباط با سرور برقرار نشد.', 'error'); }
+  }
+  function dpAskPhone() {
+    document.getElementById('dpCell').value = localStorage.getItem('rosa_cell') || '';
+    document.getElementById('dpPhone').style.display = 'flex';
+  }
+  function dpPhoneClose() { document.getElementById('dpPhone').style.display = 'none'; }
+  function dpPhoneOk() {
+    const v = dpDigits(document.getElementById('dpCell').value).replace(/\D/g, '');
+    if (!/^(09\d{9}|9\d{9})$/.test(v)) { showModal('شماره نامعتبر', 'شماره موبایل را مثل 09121234567 وارد کنید.', 'error'); return; }
+    dpPhoneClose();
+    startDigipay(DP_AMT, v);
+  }
+  // برگشت از درگاه: ?pay=ok | fail | cancel | wait
+  function handlePayReturn() {
+    const p = new URLSearchParams(location.search).get('pay');
+    if (!p) return;
+    history.replaceState(null, '', location.pathname);
+    try { sessionStorage.removeItem('dp_pending'); } catch (e) {}
+    switchTab('wallet');
+    if (TOKEN) refreshMe();
+    const m = {
+      ok: ['پرداخت موفق', 'پرداخت انجام شد و کیف پول شما شارژ شد.', 'success'],
+      cancel: ['پرداخت انجام نشد', 'پرداخت لغو شد یا انجام نشد.', 'error'],
+      fail: ['پرداخت ناموفق', 'پرداخت ناموفق بود. اگر مبلغی از حساب شما کسر شده، به‌صورت خودکار برگشت داده می‌شود.', 'error'],
+      wait: ['در حال بررسی', 'پرداخت شما در حال بررسی است. اگر مبلغ کسر شد و کیف پول شارژ نشد، از بخش پشتیبانی پیگیری کنید.', 'info']
+    }[p];
+    if (m) setTimeout(() => showModal(m[0], m[1], m[2]), 400);
+  }
+  window.addEventListener('load', () => setTimeout(handlePayReturn, 300));
+  // داخل اپ: پرداخت در مرورگر انجام می‌شود؛ وقتی کاربر به اپ برگشت، موجودی را تازه کن و نتیجه را نشان بده
+  document.addEventListener('visibilitychange', async () => {
+    if (document.hidden || !TOKEN) return;
+    let p = null;
+    try { p = JSON.parse(sessionStorage.getItem('dp_pending') || 'null'); } catch (e) {}
+    if (!p || Date.now() - p.t > 30 * 60 * 1000) return;
+    await refreshMe();
+    if (currentUser && Number(currentUser.balance) > Number(p.bal)) {
+      try { sessionStorage.removeItem('dp_pending'); } catch (e) {}
+      switchTab('wallet');
+      showModal('پرداخت موفق', 'پرداخت انجام شد و کیف پول شما شارژ شد.', 'success');
+    }
+  });
+
+  function openCardPage(amt) {
+    cardAmt = amt;
+    const g = selGw;
+    document.getElementById('cardBank').innerText = g.bank_name || g.title;
+    document.getElementById('cardNo').innerText = (g.card_number || '').replace(/(\d{4})(?=\d)/g, '$1 ') || '—';
+    document.getElementById('cardHolder').innerText = g.card_holder ? 'به نام: ' + g.card_holder : '';
+    document.getElementById('cardAmount').innerText = Number(amt).toLocaleString() + ' تومان';
+    document.getElementById('cardNote').innerText = g.note || 'مبلغ را دقیقاً همان‌طور که در بالا نوشته شده واریز کنید و فیش را بفرستید.';
+    document.getElementById('receiptFile').value = '';
+    document.getElementById('receiptName').innerText = 'هیچ فایلی انتخاب نشده';
+    document.getElementById('cardView').classList.add('open');
+  }
+  function closeCard() { document.getElementById('cardView').classList.remove('open'); }
+  function receiptChosen() {
+    const f = document.getElementById('receiptFile').files[0];
+    document.getElementById('receiptName').innerText = f ? f.name : 'هیچ فایلی انتخاب نشده';
+  }
+
+  function copyText(t, okMsg) {
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = t; document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+      showModal(ok ? 'کپی شد' : 'خطا', ok ? okMsg : 'کپی انجام نشد؛ متن را دستی یادداشت کنید.', ok ? 'success' : 'error');
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).then(() => showModal('کپی شد', okMsg, 'success')).catch(fallback);
+    } else fallback();
+  }
+  function copyCardNo() {
+    copyText((selGw && selGw.card_number) || '', 'شماره کارت کپی شد.');
+  }
+
+  // کوچک‌سازی تصویر فیش قبل از ارسال (حجم کم و سازگار با همه‌ی گوشی‌ها)
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const k = Math.min(1, 1400 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        resolve(c.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+      img.src = url;
+    });
+  }
+
+  async function sendTopup() {
+    if (needLogin()) return;
+    const f = document.getElementById('receiptFile').files[0];
+    if (!f) { showModal('فیش لازم است', 'اول تصویر فیش واریزی را انتخاب کنید.', 'error'); return; }
+    const btn = document.getElementById('sendTopupBtn');
+    btn.disabled = true;
+    try {
+      const data = await compressImage(f);
+      if (data.length > 2800000) throw new Error('big');
+      const j = await api('create_topup', { gateway_id: selGw.id, amount: cardAmt, receipt: data });
+      if (j.status === 'success') {
+        closeCard();
+        showModal('فیش ثبت شد', j.message, 'success');
+        openTopups();
+      } else showModal('خطا', j.message, 'error');
+    } catch (e) {
+      showModal('خطا', e.message === 'big' ? 'حجم تصویر زیاد است؛ تصویر کوچک‌تری انتخاب کنید.' : 'تصویر فیش خوانده نشد. یک عکس JPG یا PNG انتخاب کنید.', 'error');
+    } finally { btn.disabled = false; }
+  }
+
+  // سوابق شارژ
+  async function openTopups() {
+    if (needLogin()) return;
+    document.getElementById('subTitle').innerText = 'سوابق شارژ';
+    const box = document.getElementById('subBody');
+    box.innerHTML = '<div style="text-align:center;padding:30px">در حال بارگذاری...</div>';
+    document.getElementById('subView').classList.add('open');
+    const j = await api('my_topups');
+    const map = { pending: ['در انتظار بررسی', '#f59e0b'], approved: ['تایید شده', '#16a34a'], rejected: ['رد شده', '#ef4444'] };
+    box.innerHTML = (j.data || []).map(t => {
+      const [label, color] = map[t.status] || [t.status, 'inherit'];
+      return `<div class="summary-card" style="display:block;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-weight:800;font-size:14px"><span>${Number(t.amount).toLocaleString()} تومان</span><span style="font-size:12px;color:${color}">${label}</span></div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:6px">${esc(t.title || '')} • ${esc(t.created_at || '')}</div>
+        ${t.status === 'rejected' && t.reject_reason ? `<div style="font-size:13px;margin-top:8px;color:#ef4444">دلیل رد: ${esc(t.reject_reason)}</div>` : ''}
+      </div>`;
+    }).join('') || '<div style="text-align:center;padding:40px;color:var(--text-muted)">هنوز درخواست شارژی ندارید.</div>';
+  }
+
+  // کسب درآمد و دعوت
+  async function openReferral() {
+    if (needLogin()) return;
+    document.getElementById('subTitle').innerText = 'کسب درآمد و دعوت';
+    const box = document.getElementById('subBody');
+    box.innerHTML = '<div style="text-align:center;padding:30px">در حال بارگذاری...</div>';
+    document.getElementById('subView').classList.add('open');
+    const j = await api('my_referral');
+    if (j.status !== 'success') { box.innerHTML = `<div style="text-align:center;padding:30px">${esc(j.message || 'خطا')}</div>`; return; }
+    REF_LINK = IN_TG ? `${TG_APP_LINK}?startapp=${j.code}` : `${SITE_URL}?ref=${j.code}`;
+    const reward = j.type === 'fixed' ? `${Number(j.value).toLocaleString()} تومان` : `${j.value}%`;
+    const rule = j.first_only ? 'از اولین خرید هر دعوت‌شده' : 'از هر خرید دعوت‌شده';
+    const minTxt = j.min_purchase > 0 ? `<div style="font-size:12px;opacity:.85;margin-top:4px">حداقل مبلغ خرید دعوت‌شده: ${Number(j.min_purchase).toLocaleString()} تومان</div>` : '';
+    const off = j.enabled ? '' : '<div style="background:#fef3c7;color:#92400e;border-radius:14px;padding:12px;font-size:13px;margin-bottom:14px">این بخش فعلاً غیرفعال است.</div>';
+    box.innerHTML = `${off}
+      <div style="background:var(--primary);color:#fff;border-radius:22px;padding:20px;margin-bottom:14px">
+        <div style="font-size:13px;opacity:.9">پاداش شما برای هر دعوت</div>
+        <div style="font-size:24px;font-weight:800;margin-top:6px">${reward}</div>
+        <div style="font-size:12px;opacity:.9;margin-top:4px">${rule}</div>${minTxt}
+      </div>
+      <div class="summary-card" style="display:block;margin-bottom:14px">
+        <div style="font-size:12px;color:var(--text-muted)">لینک اختصاصی شما</div>
+        <div dir="ltr" style="font-size:13px;font-weight:700;word-break:break-all;margin:8px 0;text-align:left">${esc(REF_LINK)}</div>
+        <div style="font-size:12px;color:var(--text-muted)">کد معرف: <b dir="ltr">${esc(j.code)}</b></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="submit-order-btn" style="flex:1;justify-content:center" onclick="copyText(REF_LINK,'لینک دعوت کپی شد.')"><span>کپی لینک</span></button>
+          <button class="submit-order-btn" style="flex:1;justify-content:center" onclick="shareRef()"><span>اشتراک‌گذاری</span></button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;text-align:center">
+        <div class="summary-card" style="display:block;padding:12px 6px"><div style="font-size:11px;color:var(--text-muted)">دعوت‌شده</div><div style="font-weight:800;font-size:16px;margin-top:4px">${j.invited}</div></div>
+        <div class="summary-card" style="display:block;padding:12px 6px"><div style="font-size:11px;color:var(--text-muted)">خریدکرده</div><div style="font-weight:800;font-size:16px;margin-top:4px">${j.buyers}</div></div>
+        <div class="summary-card" style="display:block;padding:12px 6px"><div style="font-size:11px;color:var(--text-muted)">درآمد کل</div><div style="font-weight:800;font-size:14px;margin-top:4px">${Number(j.total_earned).toLocaleString()}</div></div>
+      </div>
+      <div class="form-label" style="margin-bottom:8px">دعوت‌شده‌های شما</div>
+      ${(j.list || []).map(i => `<div class="summary-card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div><div style="font-weight:800;font-size:14px">${esc(i.name)}</div><div style="font-size:12px;color:var(--text-muted);margin-top:4px">${esc(i.joined || '')}</div></div>
+        <div style="text-align:left;font-size:12px"><div style="color:${i.bought ? '#16a34a' : 'var(--text-muted)'}">${i.bought ? 'خرید کرده' : 'هنوز خرید نکرده'}</div>
+        ${i.earned > 0 ? `<div style="font-weight:800;margin-top:4px">+${Number(i.earned).toLocaleString()} ت</div>` : ''}</div>
+      </div>`).join('') || '<div style="text-align:center;padding:24px;color:var(--text-muted)">هنوز کسی را دعوت نکرده‌اید.</div>'}`;
+  }
+  function shareRef() {
+    if (navigator.share) navigator.share({ title: 'رز پنل', text: 'با این لینک ثبت‌نام کن و خدمات مجازی تلگرام را سریع سفارش بده', url: REF_LINK }).catch(() => {});
+    else copyText(REF_LINK, 'لینک دعوت کپی شد.');
+  }
+
+  // ورود خودکار داخل تلگرام
+  const TG_LOGIN = false; // ورود خودکار با تلگرام غیرفعال است؛ کاربر مثل سایت ثبت‌نام/ورود می‌کند
+  const IN_TG = TG_LOGIN && !!(window.Telegram && Telegram.WebApp && Telegram.WebApp.initData);
+  const TG_APP_LINK = 'https://t.me/rosePanellbot/rosepanel';
+
+  function tgPost(action, extra) {
+    return fetch(API_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, init_data: Telegram.WebApp.initData, ...(extra || {}) })
+    }).then(r => r.json()).catch(() => ({ status: 'error', message: 'ارتباط با سرور برقرار نشد.' }));
+  }
+  function tgDone(j) {
+    if (j.status === 'success' && j.token) {
+      setSession(j.token, j.user);
+      document.getElementById('tgView').classList.remove('open');
+    } else showModal('خطا', j.message || 'انجام نشد.', 'error');
+  }
+  function tgInit() {
+    if (!IN_TG) return false;
+    try { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } catch (e) {}
+    tgPost('tg_login').then(j => {
+      if (j.status === 'success' && j.needs_link) {
+        document.getElementById('tgName').innerText = j.name || '';
+        document.getElementById('tgView').classList.add('open');
+      } else tgDone(j);
+    });
+    return true;
+  }
+  function tgCreate() { tgPost('tg_create').then(tgDone); }
+  function tgShowForm() {
+    document.getElementById('tgChoice').style.display = 'none';
+    document.getElementById('tgForm').style.display = 'block';
+  }
+  function tgLink() {
+    tgPost('tg_link', {
+      identifier: document.getElementById('tgIdent').value.trim(),
+      password: document.getElementById('tgPass').value
+    }).then(tgDone);
   }
 
   // ۸. ذخیره مشخصات پروفایل
   async function saveProfile() {
+    if (needLogin()) return;
     const j = await api('update_profile', {
       name: document.getElementById('profileName').value.trim(),
       email: document.getElementById('profileEmail').value.trim(),
@@ -1233,6 +1855,7 @@
   // سفارش‌های من و پشتیبانی
   function closeSub() { document.getElementById('subView').classList.remove('open'); }
   async function openOrders() {
+    if (needLogin()) return;
     document.getElementById('subTitle').innerText = 'سفارش‌های من';
     const box = document.getElementById('subBody');
     box.innerHTML = '<div style="text-align:center;padding:30px">در حال بارگذاری...</div>';
@@ -1245,6 +1868,7 @@
       || '<div style="text-align:center;padding:40px;color:var(--text-muted)">هنوز سفارشی ثبت نکرده‌اید.</div>';
   }
   async function openTickets() {
+    if (needLogin()) return;
     document.getElementById('subTitle').innerText = 'پشتیبانی';
     const box = document.getElementById('subBody');
     document.getElementById('subView').classList.add('open');
@@ -1259,6 +1883,7 @@
         || '<div style="text-align:center;padding:20px;color:var(--text-muted)">تیکتی ندارید.</div>');
   }
   async function sendTicket() {
+    if (needLogin()) return;
     const j = await api('create_ticket', { title: document.getElementById('tkTitle').value, message: document.getElementById('tkMsg').value });
     if (j.status === 'success') openTickets(); else showModal('خطا', j.message, 'error');
   }
@@ -1297,6 +1922,254 @@
   function closeModal() {
     document.getElementById('appAlert').classList.remove('active');
   }
+
+  /* ================= شماره مجازی ================= */
+  let VN_APPS = [], VN_LOADED = false, VN_SVC = null, VN_LIST = [], VN_SEL = null;
+  let VN_ORDER = null, VN_TIMER = null, VN_BUSY = false, VN_MY = [];
+  const VN_STATUS = {
+    buying: 'در حال ثبت', waiting: 'منتظر کد', received: 'کد دریافت شد', done: 'تکمیل شده',
+    failed: 'ناموفق؛ مبلغ برگشت داده شد', refunded: 'مبلغ برگشت داده شد', expired: 'منقضی؛ مبلغ برگشت داده شد'
+  };
+  const vnMsg = (t, retry) => `<div style="text-align:center;padding:36px 10px;color:var(--text-muted);line-height:2">${esc(t)}${retry ? '<br><button class="vn-copy" style="margin-top:10px" onclick="vnInit(true)">تلاش دوباره</button>' : ''}</div>`;
+  const vnLoading = '<div style="text-align:center;padding:30px;color:var(--text-muted)">در حال بارگذاری...</div>';
+
+  // آیکون و رنگ هر سرویس از روی نام/کد آن
+  function vnStyle(a) {
+    const t = ((a.code || '') + ' ' + (a.title || '')).toLowerCase();
+    const m = [
+      [/telegram|تلگرام|\btg\b/, 'fa-brands fa-telegram', 'linear-gradient(135deg,#0ea5e9,#0284c7)'],
+      [/whatsapp|واتس|\bwa\b/, 'fa-brands fa-whatsapp', 'linear-gradient(135deg,#22c55e,#16a34a)'],
+      [/instagram|اینستا|\big\b/, 'fa-brands fa-instagram', 'linear-gradient(135deg,#ec4899,#be185d)'],
+      [/google|گوگل|gmail|جیمیل/, 'fa-brands fa-google', 'linear-gradient(135deg,#ef4444,#b91c1c)'],
+      [/facebook|فیسبوک|فیس بوک/, 'fa-brands fa-facebook', 'linear-gradient(135deg,#3b82f6,#1d4ed8)'],
+      [/twitter|توییتر|تویتر/, 'fa-brands fa-twitter', 'linear-gradient(135deg,#38bdf8,#0284c7)'],
+      [/tiktok|تیک تاک|تیکتاک/, 'fa-brands fa-tiktok', 'linear-gradient(135deg,#334155,#0f172a)'],
+      [/discord|دیسکورد/, 'fa-brands fa-discord', 'linear-gradient(135deg,#818cf8,#4f46e5)'],
+      [/snapchat|اسنپ چت/, 'fa-brands fa-snapchat', 'linear-gradient(135deg,#facc15,#ca8a04)']
+    ].find(x => x[0].test(t));
+    return m ? { icon: m[1], bg: m[2] } : { icon: 'fa-solid fa-mobile-screen', bg: 'linear-gradient(135deg,#8b5cf6,#6d28d9)' };
+  }
+
+  function openVirtualTab() { switchTab('virtual'); vnInit(); }
+
+  async function vnInit(force) {
+    if (VN_LOADED && !force) return;
+    const box = document.getElementById('vnApps');
+    box.innerHTML = vnLoading;
+    try {
+      const j = await api('vn_services');
+      if (j.status !== 'success') { box.innerHTML = vnMsg(j.message || 'خطا در دریافت اطلاعات', true); return; }
+      if (!j.enabled) { box.innerHTML = vnMsg('بخش شماره مجازی به‌زودی فعال می‌شود.'); return; }
+      VN_APPS = j.apps || [];
+      VN_LOADED = true;
+      renderVnApps();
+    } catch (e) { box.innerHTML = vnMsg('ارتباط با سرور برقرار نشد.', true); }
+  }
+
+  function renderVnApps() {
+    const q = document.getElementById('vnSearch').value.trim().toLowerCase();
+    const l = VN_APPS.filter(a => !q || (a.title + ' ' + a.code).toLowerCase().includes(q));
+    document.getElementById('vnApps').innerHTML = l.map(a => {
+      const st = vnStyle(a);
+      return `<div class="soft-service-card" onclick="openVnService(${a.id})">
+        <div class="w-right">
+          <div class="w-icon" style="background:${st.bg}"><i class="${st.icon}"></i></div>
+          <div><div class="w-title">${esc(a.title)}</div><div class="w-sub">انتخاب کشور و دریافت شماره</div></div>
+        </div>
+        <i class="fa-solid fa-chevron-left text-muted"></i>
+      </div>`;
+    }).join('') || vnMsg('سرویسی یافت نشد.');
+  }
+
+  async function openVnService(id) {
+    VN_SVC = VN_APPS.find(a => a.id == id);
+    if (!VN_SVC) return;
+    VN_SEL = null; VN_LIST = [];
+    document.getElementById('vnCountryTitle').innerText = VN_SVC.title;
+    document.getElementById('vnCSearch').value = '';
+    document.getElementById('vnCountries').innerHTML = vnLoading;
+    vnUpdateBar();
+    document.getElementById('vnCountryView').classList.add('open');
+    await vnLoadPrices();
+  }
+  async function vnLoadPrices() {
+    const svc = VN_SVC;
+    if (!svc) return;
+    try {
+      const j = await api('vn_prices', { service_id: svc.id });
+      if (VN_SVC !== svc) return;
+      if (j.status !== 'success') { document.getElementById('vnCountries').innerHTML = vnMsg(j.message || 'خطا در دریافت قیمت‌ها'); return; }
+      VN_LIST = j.data || [];
+      if (VN_SEL && !VN_LIST.find(c => c.range === VN_SEL && c.avail)) VN_SEL = null;
+      renderVnCountries();
+      vnUpdateBar();
+    } catch (e) { if (VN_SVC === svc) document.getElementById('vnCountries').innerHTML = vnMsg('ارتباط با سرور برقرار نشد.'); }
+  }
+  function closeVnCountry() {
+    VN_SVC = null; VN_SEL = null;
+    document.getElementById('vnCountryView').classList.remove('open');
+  }
+  function renderVnCountries() {
+    const q = document.getElementById('vnCSearch').value.trim().toLowerCase();
+    const l = VN_LIST.filter(c => !q || (c.country + ' ' + c.range).toLowerCase().includes(q));
+    document.getElementById('vnCountries').innerHTML = l.map(c => `<div class="soft-service-card vn-row ${c.avail ? '' : 'off'} ${VN_SEL === c.range ? 'sel' : ''}" onclick="vnPick('${esc(c.range)}')">
+        <div class="w-right"><div>
+          <div class="w-title">${esc(c.country)}</div>
+          <div class="w-sub">${c.avail ? 'موجود' : 'ناموجود'} • پیش‌شماره ${esc(c.range)}+</div>
+        </div></div>
+        <div class="vn-price">${c.avail ? Number(c.price).toLocaleString() + ' ت' : '—'}</div>
+      </div>`).join('') || vnMsg('کشوری یافت نشد.');
+  }
+  function vnPick(range) {
+    const c = VN_LIST.find(x => x.range === range);
+    if (!c || !c.avail) return;
+    VN_SEL = range;
+    renderVnCountries();
+    vnUpdateBar();
+  }
+  function vnUpdateBar() {
+    const c = VN_LIST.find(x => x.range === VN_SEL);
+    document.getElementById('vnSelLabel').innerText = c ? c.country : 'کشوری انتخاب نشده';
+    document.getElementById('vnSelPrice').innerText = c ? Number(c.price).toLocaleString() : '۰';
+    document.getElementById('vnBuyBtn').style.opacity = c ? 1 : 0.5;
+  }
+
+  function vnConfirmBuy() {
+    if (VN_BUSY) return;
+    const c = VN_LIST.find(x => x.range === VN_SEL);
+    if (!c) { showModal('انتخاب کشور', 'ابتدا یک کشور را از لیست انتخاب کنید.', 'info'); return; }
+    if (needLogin()) return;
+    askConfirm(`شماره ${VN_SVC.title} (${c.country}) به مبلغ ${Number(c.price).toLocaleString()} تومان خریداری شود؟ مبلغ از کیف پول شما کسر می‌شود.`, 'خرید شماره', () => vnBuy(c), 'var(--primary)');
+  }
+  function vnSetBalance(b) {
+    if (b === undefined || b === null) return;
+    currentUser.balance = Number(b);
+    localStorage.setItem('rosa_user', JSON.stringify(currentUser));
+    updateUserUI();
+  }
+  async function vnBuy(c) {
+    if (VN_BUSY) return;
+    VN_BUSY = true;
+    const btn = document.getElementById('vnBuyBtn');
+    btn.style.opacity = 0.6;
+    try {
+      const j = await api('vn_buy', { service_id: VN_SVC.id, range: c.range, expected_price: c.price });
+      if (j.status === 'success') {
+        vnSetBalance(j.new_balance);
+        closeVnCountry();
+        vnShowOrder(j.order);
+      } else {
+        showModal('خطا', j.message || 'خرید انجام نشد.', 'error');
+        refreshMe();
+        vnLoadPrices();
+      }
+    } catch (e) {
+      showModal('خطای ارتباط', 'پاسخ سرور دریافت نشد. قبل از تلاش دوباره، «شماره‌های من» را بررسی کنید.', 'error');
+    }
+    VN_BUSY = false;
+    vnUpdateBar();
+  }
+
+  // صفحه‌ی شماره و کد
+  function vnShowOrder(o) {
+    VN_ORDER = o;
+    vnRenderOrder();
+    document.getElementById('vnOrderView').classList.add('open');
+    vnStartPoll();
+  }
+  function closeVnOrder() {
+    vnStopPoll();
+    VN_ORDER = null;
+    document.getElementById('vnOrderView').classList.remove('open');
+    if (document.getElementById('subView').classList.contains('open') && document.getElementById('subTitle').innerText === 'شماره‌های من') openVnOrders();
+  }
+  function vnStartPoll() {
+    vnStopPoll();
+    if (VN_ORDER && VN_ORDER.status === 'waiting') VN_TIMER = setInterval(vnCheckNow, 5000);
+  }
+  function vnStopPoll() { if (VN_TIMER) { clearInterval(VN_TIMER); VN_TIMER = null; } }
+
+  async function vnCheckNow() {
+    if (!VN_ORDER) return;
+    const id = VN_ORDER.id;
+    try {
+      const j = await api('vn_code', { order_id: id });
+      if (!VN_ORDER || VN_ORDER.id !== id || j.status !== 'success') return;
+      const hadCode = VN_ORDER.code;
+      VN_ORDER = j.order;
+      vnSetBalance(j.new_balance);
+      vnRenderOrder();
+      if (VN_ORDER.status !== 'waiting') vnStopPoll();
+      if (VN_ORDER.code && VN_ORDER.code !== hadCode && navigator.vibrate) navigator.vibrate(250);
+    } catch (e) {}
+  }
+  function vnCopyNumber() { if (VN_ORDER) copyText(VN_ORDER.number || '', 'شماره کپی شد.'); }
+  function vnCopyCode() { if (VN_ORDER) copyText(VN_ORDER.code || '', 'کد کپی شد.'); }
+  function vnLogoutAsk() {
+    askConfirm('بعد از ورود موفق به اکانت با این کد، ربات از اکانت خارج می‌شود. ادامه می‌دهید؟', 'خروج ربات', vnLogout, 'var(--primary)');
+  }
+  async function vnLogout() {
+    if (!VN_ORDER) return;
+    try {
+      const j = await api('vn_logout', { order_id: VN_ORDER.id });
+      if (j.status === 'success') { VN_ORDER = j.order; vnRenderOrder(); showModal('انجام شد', 'ربات از اکانت خارج شد.', 'success'); }
+      else showModal('خطا', j.message || 'انجام نشد.', 'error');
+    } catch (e) { showModal('خطای ارتباط', 'ارتباط با سرور برقرار نشد.', 'error'); }
+  }
+
+  function vnRenderOrder() {
+    const o = VN_ORDER;
+    if (!o) return;
+    let mid = '';
+    if (o.status === 'waiting' || o.status === 'buying') {
+      mid = `<div class="vn-box"><div class="vn-spin"></div>
+        <div style="font-weight:800;font-size:14px">در انتظار دریافت کد...</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.9;margin-top:6px">شماره را در برنامه‌ی ${esc(o.service_title)} وارد کنید و درخواست ارسال کد بدهید. کد به‌محض رسیدن همین‌جا نمایش داده می‌شود.</div>
+        <button class="vn-copy" style="margin-top:12px" onclick="vnCheckNow()"><i class="fa-solid fa-rotate"></i> بررسی دوباره</button></div>`;
+    } else if (o.status === 'received' || o.status === 'done') {
+      mid = `<div class="vn-box"><div style="font-size:12px;color:var(--text-muted)">کد تأیید</div>
+        <div class="vn-code">${esc(o.code)}</div>
+        <button class="vn-copy" onclick="vnCopyCode()"><i class="fa-solid fa-copy"></i> کپی کد</button>
+        ${o.status === 'received' ? '<button class="vn-copy" onclick="vnCheckNow()"><i class="fa-solid fa-rotate"></i> دریافت مجدد</button>' : ''}</div>`;
+      if (o.status === 'received') mid += `<div class="vn-box" style="text-align:right">
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.9;margin-bottom:10px">پس از ورود موفق به اکانت با این کد، دکمه‌ی زیر را بزنید تا ربات از اکانت خارج شود.</div>
+        <button class="submit-order-btn" style="width:100%;justify-content:center" onclick="vnLogoutAsk()"><i class="fa-solid fa-right-from-bracket"></i><span>خروج ربات از اکانت</span></button></div>`;
+    } else {
+      mid = `<div class="vn-box" style="color:var(--text-muted);font-size:13px;line-height:2">${esc(VN_STATUS[o.status] || o.status)}</div>`;
+    }
+    document.getElementById('vnOrderBody').innerHTML = `
+      <div class="summary-card" style="display:block">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <div style="font-size:15px;font-weight:800">${esc(o.service_title)} • ${esc(o.country)}</div>
+          <span class="badge-tag purple">${esc(VN_STATUS[o.status] || o.status)}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:6px">مبلغ: ${Number(o.price).toLocaleString()} ت</div>
+      </div>
+      ${o.number ? `<div class="vn-box"><div style="font-size:12px;color:var(--text-muted)">شماره</div>
+        <div class="vn-num">${esc(o.number)}</div>
+        <button class="vn-copy" onclick="vnCopyNumber()"><i class="fa-solid fa-copy"></i> کپی شماره</button></div>` : ''}
+      ${mid}
+      ${o.quality ? `<div class="note-box"><i class="fa-solid fa-circle-info" style="font-size:16px"></i><div>${esc(o.quality)}</div></div>` : ''}`;
+  }
+
+  // شماره‌های من
+  async function openVnOrders() {
+    if (needLogin()) return;
+    document.getElementById('subTitle').innerText = 'شماره‌های من';
+    const box = document.getElementById('subBody');
+    box.innerHTML = vnLoading;
+    document.getElementById('subView').classList.add('open');
+    try {
+      const j = await api('vn_my');
+      VN_MY = j.data || [];
+    } catch (e) { box.innerHTML = vnMsg('ارتباط با سرور برقرار نشد.'); return; }
+    box.innerHTML = VN_MY.map((o, i) => `<div class="summary-card" style="display:block;margin-bottom:10px;cursor:pointer" onclick="vnOpenMy(${i})">
+        <div style="display:flex;justify-content:space-between;font-weight:800;font-size:14px;gap:8px"><span>${esc(o.service_title)} • ${esc(o.country)}</span><span style="font-size:12px;color:var(--primary);white-space:nowrap">${esc(VN_STATUS[o.status] || o.status)}</span></div>
+        <div style="font-size:13px;margin-top:6px;direction:ltr;text-align:right">${esc(o.number || '—')}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px">${Number(o.price).toLocaleString()} ت • ${esc(o.created_at)}</div></div>`).join('')
+      || '<div style="text-align:center;padding:40px;color:var(--text-muted)">هنوز شماره‌ای نگرفته‌اید.</div>';
+  }
+  function vnOpenMy(i) { if (VN_MY[i]) vnShowOrder(VN_MY[i]); }
 </script>
 
 </body>
